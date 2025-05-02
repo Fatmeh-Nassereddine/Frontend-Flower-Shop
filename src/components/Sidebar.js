@@ -98,8 +98,8 @@ const Sidebar = ({ sidebarCollapsed, setActiveTab, toggleSidebar, darkMode, acti
         </Link>
 
         <Link
-          to="/categories"
-          onClick={() => setActiveTab('categories')}
+          to="/category"
+          onClick={() => setActiveTab('category')}
           className={`cursor-pointer flex items-center p-4 ${sidebarCollapsed ? 'justify-center' : ''} ${activeTab === 'categories' ? `${activeClass}` : `${inactiveClass}`}`}
         >
           <FontAwesomeIcon icon={faList} />

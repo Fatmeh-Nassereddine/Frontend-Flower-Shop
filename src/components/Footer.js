@@ -1,51 +1,60 @@
-// import React from 'react';
-
-// function Footer() {
-//   return (
-//     <footer className="bg-gray-900 text-white text-center py-8 mt-12">
-//       <div className="text-sm">&copy; 2025 FlowerShop. All rights reserved.</div>
-//       <div className="flex justify-center space-x-4 mt-4">
-//         <a href="#" className="hover:underline">Instagram</a>
-//         <a href="#" className="hover:underline">Facebook</a>
-//         <a href="#" className="hover:underline">Twitter</a>
-//       </div>
-//     </footer>
-//   );
-// }
-
-// export default Footer;
 
 
 import React from 'react';
 import { Link } from 'react-router-dom';
+import logo from '../assets/logo.svg';
 
-function Footer() {
+import { FaFacebookF, FaVk, FaInstagram, FaPhoneAlt, FaMapMarkerAlt } from 'react-icons/fa';
+
+export default function Footer() {
   return (
-    <footer className="bg-gray-900 text-white text-center py-8 mt-12">
-      <div className="text-sm">&copy; 2025 FlowerShop. All rights reserved.</div>
+    <footer className="bg-[#9EA0A2] text-white py-8 px-4 md:px-12">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 text-sm">
+        {/* Logo */}
+        <div className="flex flex-col items-start">
+          <img
+            src={logo} // Replace with your actual logo path
+            alt="Tima's Elegant Essence"
+            className="w-32 h-auto mb-4"
+          />
+        </div>
 
-      <div className="flex justify-center space-x-6 mt-4">
-        {/* Internal Links */}
-        <Link to="/shop" className="hover:underline">Shop</Link>
-        <Link to="/about" className="hover:underline">About</Link>
-        <Link to="/contact" className="hover:underline">Contact</Link>
+       {/* Shop Links */}
+       <div className="flex flex-col gap-2">
+          <h3 className="font-semibold mb-2">Shop</h3>
+          <Link to="/categories" className="hover:underline">Categories</Link>
+          <Link to="/seasonal" className="hover:underline">Seasonal</Link>
+          <Link to="/shop" className="hover:underline">All Products</Link>
+        </div>
+
+        {/* Company Links */}
+        <div className="flex flex-col gap-2">
+          <h3 className="font-semibold mb-2">Company</h3>
+          <Link to="/about" className="hover:underline">About Us</Link>
+          <Link to="/contact" className="hover:underline">Contact Us</Link>
+        </div>
+        {/* Contact Info + Social */}
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center gap-2">
+            <FaMapMarkerAlt />
+            <span>Lebanon</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <FaPhoneAlt />
+            <span>+961-81-888-111</span>
+          </div>
+          <div className="flex gap-4 mt-2">
+            <a href="#"><FaFacebookF /></a>
+            <a href="#"><FaVk /></a>
+            <a href="#"><FaInstagram /></a>
+          </div>
+        </div>
       </div>
 
-      <div className="flex justify-center space-x-6 mt-4">
-        {/* External Social Media Links */}
-        <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="hover:underline">
-          Instagram
-        </a>
-        <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="hover:underline">
-          Facebook
-        </a>
-        <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="hover:underline">
-          Twitter
-        </a>
+      {/* Bottom Text */}
+      <div className="text-center text-xs text-white mt-8">
+        © All rights reserved
       </div>
     </footer>
   );
 }
-
-export default Footer;
-
