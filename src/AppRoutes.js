@@ -29,9 +29,10 @@ import Seasonal from './pages/Seasonal';
 import Contact from './pages/Contact';
 import CartPage from './pages/CartPage';
 import Favorite from './pages/Favorite';
-import CategoryPage from './pages/Category';
+import CategoryPage from './pages/CategoryPage';
 import ProductPage from './pages/ProductPage';
 import LoginUp from './components/popAuth/LoginUp';
+import ProductsByCategoryPage from "./pages/ProductsByCategoryPage"; 
 
 
 function AppRoutes({ darkMode, toggleSidebar, toggleDarkMode, sidebarCollapsed, activeTab, setActiveTab }) {
@@ -54,6 +55,7 @@ function AppRoutes({ darkMode, toggleSidebar, toggleDarkMode, sidebarCollapsed, 
       <Route path="/categories" element={<CategoryPage />} />
       <Route path="/product/:id" element={<ProductPage />} />
       <Route path="/login" element={<LoginUp />} />
+      <Route path="/category/:categoryId" element={<ProductsByCategoryPage />} /> 
 
       {/* Admin Dashboard Layout */}
       <Route path="/dashboard/*" element={

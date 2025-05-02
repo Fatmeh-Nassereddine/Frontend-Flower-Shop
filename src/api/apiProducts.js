@@ -149,3 +149,15 @@ export const getProductsBySeason = async (seasonId) => {
     throw new Error('Failed to fetch products by season');
   }
 };
+
+
+// 🔹 Get products by category ID
+export const getProductsByCategory = async (categoryId) => {
+  try {
+    const response = await apiClient.get(`/category/${categoryId}`);
+    return response.data;
+  } catch (error) {
+    console.error("❌ Error fetching products by category:", error);
+    throw error;
+  }
+};

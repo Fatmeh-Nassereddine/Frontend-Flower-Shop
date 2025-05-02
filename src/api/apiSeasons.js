@@ -14,14 +14,28 @@ const apiClient = axios.create({
 // Automatically add Authorization header if token is present
 apiClient.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token'); // Retrieve token from local storage
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`; // Attach token if available
+
+    // Skip auth for public endpoints
+    if (!config.skipAuth) {
+      const token = localStorage.getItem('token');
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
     }
     return config;
   },
   (error) => Promise.reject(error)
 );
+
+
+//     const token = localStorage.getItem('token'); // Retrieve token from local storage
+//     if (token) {
+//       config.headers.Authorization = `Bearer ${token}`; // Attach token if available
+//     }
+//     return config;
+//   },
+//   (error) => Promise.reject(error)
+// );
 
 // Global error handling for API responses
 apiClient.interceptors.response.use(
@@ -36,10 +50,11 @@ const apiSeasons = {
   // 🔹 For customers (authenticated)
   getAll: async () => {
     try {
-      const res = await apiClient.get('/');
+      const res = await apiClient.get('/', { skipAuth: true });
+      console.log("Seasons Data:", res.data);  // Log response data
       return res.data; // Return the list of all seasons
     } catch (error) {
-      console.error('Error fetching all seasons for customer:', error);
+      console.error("Season API Error:", error.response || error.message);
       throw new Error('Failed to fetch all seasons');
     }
   },

@@ -49,7 +49,7 @@ function Shop() {
   const fetchProducts = async () => {
     setLoading(true);
     try {
-      const response = await getAllProducts(
+      const result = await getAllProducts(
         page,
         limit,
         selectedCategories,
@@ -57,14 +57,19 @@ function Shop() {
         searchQuery,
         priceRange
       );
-      setProducts(response.data || []);
-      setTotalPages(response.totalPages || 1);
+  
+      // ✅ Now result is already the actual data
+      setProducts(result.data || []);
+      setTotalPages(result.totalPages || 1);
     } catch (error) {
       console.error("Error loading products:", error.message);
     } finally {
       setLoading(false);
     }
   };
+  
+  
+  
 
   useEffect(() => {
     fetchCategoriesAndSeasons();
@@ -76,18 +81,27 @@ function Shop() {
   }, [page, selectedCategories, selectedSeasons, searchQuery, priceRange]);
 
   const handleCategoryChange = (id) => {
-    setSelectedCategories((prev) =>
-      prev.includes(id) ? prev.filter((catId) => catId !== id) : [...prev, id]
-    );
+    setSelectedCategories((prev) => {
+      const updated = prev.includes(id)
+        ? prev.filter((catId) => catId !== id)
+        : [...prev, id];
+      console.log('Updated Categories:', updated); // Debugging log
+      return updated;
+    });
     setPage(1);
   };
-
+  
+  
   const handleSeasonChange = (id) => {
-    setSelectedSeasons((prev) =>
-      prev.includes(id) ? prev.filter((seasonId) => seasonId !== id) : [...prev, id]
-    );
+    setSelectedSeasons((prev) => {
+      const updated = prev.includes(id)
+        ? prev.filter((seasonId) => seasonId !== id)
+        : [...prev, id];
+      return updated;
+    });
     setPage(1);
   };
+  
 
   const debouncedSearch = useCallback(
     debounce((value) => {
@@ -139,13 +153,13 @@ function Shop() {
           <div>
             <h3 className="font-medium">Categories</h3>
             <ul className="space-y-2">
-              {categories.map(({ category_id, name }) => (
-                <li key={category_id}>
+              {categories.map(({ id, name }) => (
+                <li key={id}>
                   <label className="flex items-center space-x-2 cursor-pointer">
                     <input
                       type="checkbox"
-                      checked={selectedCategories.includes(category_id)}
-                      onChange={() => handleCategoryChange(category_id)}
+                      checked={selectedCategories.includes(id)}
+                      onChange={() => handleCategoryChange(id)}
                       className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 rounded"
                     />
                     <span>{name}</span>
@@ -159,13 +173,13 @@ function Shop() {
           <div className="mt-6">
             <h3 className="font-medium">Seasons</h3>
             <ul className="space-y-2">
-              {seasons.map(({ season_id, name }) => (
-                <li key={season_id}>
+              {seasons.map(({ id, name }) => (
+                <li key={id}>
                   <label className="flex items-center space-x-2 cursor-pointer">
                     <input
                       type="checkbox"
-                      checked={selectedSeasons.includes(season_id)}
-                      onChange={() => handleSeasonChange(season_id)}
+                      checked={selectedSeasons.includes(id)}
+                      onChange={() => handleSeasonChange(id)}
                       className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 rounded"
                     />
                     <span>{name}</span>
@@ -187,7 +201,6 @@ function Shop() {
                 {products.map((product) => (
                   <Link to={`/product/${product.product_id}`} key={product.product_id}> {/* Link to the product details page */}
                   <ProductCard
-                    key={product.product_id}
                     productId={product.product_id}
                     title={product.name}
                     price={product.price}
