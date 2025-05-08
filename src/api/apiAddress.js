@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000/api/address'; // Replace this with your backend URL
+const API_URL = 'https://backend-flower-shop.onrender.com/api/address'; // Replace this with your backend URL
 axios.defaults.withCredentials = true;
 
 // Helper function to get the authenticated user's addresses

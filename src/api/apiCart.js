@@ -4,7 +4,7 @@ import axios from 'axios';
 axios.defaults.withCredentials = true;
 
 // Base API endpoint
-const BASE_URL = 'http://localhost:5000/api/carts';
+const BASE_URL = 'https://backend-flower-shop.onrender.com/api/carts';
 
 // Centralized error handler
 const handleError = (error) => {

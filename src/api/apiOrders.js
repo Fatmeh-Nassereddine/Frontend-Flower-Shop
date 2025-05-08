@@ -3,7 +3,7 @@ import axios from 'axios';
 // Always include cookies in requests
 axios.defaults.withCredentials = true;
 
-const API_BASE_URL = 'http://localhost:5000/api/orders';
+const API_BASE_URL = 'https://backend-flower-shop.onrender.com/api/orders';
 
 // Centralized error handler
 const handleError = (error) => {

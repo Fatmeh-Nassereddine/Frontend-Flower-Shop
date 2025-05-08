@@ -78,37 +78,32 @@
 
 import axios from "axios";
 
-// Set base URL and enable cookies with requests
-axios.defaults.baseURL = "http://localhost:5000";
+// ✅ Set base URL and enable cookies globally
+axios.defaults.baseURL = process.env.REACT_APP_API_URL || "https://backend-flower-shop.onrender.com";
 axios.defaults.withCredentials = true;
 
+// ===========================
+// 🔑 AUTHENTICATION SERVICES
+// ===========================
 
-
-
-//Login 
-
-// authService.js
+// Login
 export const login = async (email, password) => {
   try {
-    const response = await axios.post(`http://localhost:5000/api/auth/login`, { email, password }, {
-      withCredentials: true // Ensure cookies are sent with the request
-    });
-
-    // Store the user in a state or context instead of localStorage
+    const response = await axios.post("https://backend-flower-shop.onrender.com/api/auth/login", { email, password });
     return response.data.user;
   } catch (error) {
-    throw error;
+    console.error("Error during login:", error);
+    throw new Error(error.response?.data?.error || "Login failed");
   }
 };
-
-
 
 // Register
 export const register = async (name, email, password, address) => {
   try {
-    const response = await axios.post(`http://localhost:5000/api/auth/register`, { name, email, password, address });
+    const response = await axios.post("https://backend-flower-shop.onrender.com/api/auth/register", { name, email, password, address });
     return response.data;
   } catch (error) {
+    console.error("Error during registration:", error);
     throw new Error(error.response?.data?.error || "Registration failed");
   }
 };
@@ -116,9 +111,10 @@ export const register = async (name, email, password, address) => {
 // Logout
 export const logout = async () => {
   try {
-    const response = await axios.post(`http://localhost:5000/api/auth/logout`);
+    const response = await axios.post("https://backend-flower-shop.onrender.com/api/auth/logout");
     return response.data;
   } catch (error) {
+    console.error("Error during logout:", error);
     throw new Error(error.response?.data?.error || "Logout failed");
   }
 };
@@ -126,17 +122,13 @@ export const logout = async () => {
 // Get the current logged-in user (based on session cookie)
 export const getUser = async () => {
   try {
-    const response = await axios.get(`http://localhost:5000/api/auth/verify`, {
-      withCredentials: true, // 👈 send cookies!
-    });
-
+    const response = await axios.get("https://backend-flower-shop.onrender.com/api/auth/verify");
     return response.data;
   } catch (error) {
-    console.error("Error fetching user:", error); // Log error for debugging
+    console.error("Error fetching user:", error);
     throw new Error("Failed to authenticate the user");
   }
 };
-
 
 
 

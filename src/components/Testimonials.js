@@ -12,7 +12,7 @@ export default function Testimonials() {
   useEffect(() => {
     const fetchTestimonials = async () => {
       try {
-        const res = await axios.get('http://localhost:5000/api/testimonial', {
+        const res = await axios.get('https://backend-flower-shop.onrender.com/api/testimonial', {
           withCredentials: true,
         });
         setTestimonials(res.data); // Set testimonials in state
@@ -32,7 +32,7 @@ export default function Testimonials() {
     try {
       // Post the testimonial
       await axios.post(
-        'http://localhost:5000/api/testimonial',
+        'https://backend-flower-shop.onrender.com/api/testimonial',
         { quote },
         {
           withCredentials: true,
@@ -57,7 +57,7 @@ export default function Testimonials() {
       });
   
       // Re-fetch testimonials to include the new testimonial with the name
-      const res = await axios.get('http://localhost:5000/api/testimonial', {
+      const res = await axios.get('https://backend-flower-shop.onrender.com/api/testimonial', {
         withCredentials: true,
       });
       setTestimonials(res.data); // Update the state with the full list of testimonials, including the name

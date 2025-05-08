@@ -1,244 +1,4 @@
-// import React, { useState, useEffect } from 'react';
-// import axios from 'axios';
-// import PersonIcon from '@mui/icons-material/Person';
-// import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
-// import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
-// import Header from '../components/Header';
-// import Footer from '../components/Footer';
-// import { getFavorites } from '../api/apiFavorite'; 
-// import { getOrderItemsByUser } from '../api/apiOrders';// Importing the getFavorites function
 
-// const AccountProfile = () => {
-//   const [activeTab, setActiveTab] = useState('profile');
-//   const [isEditing, setIsEditing] = useState(false);
-//   const [profile, setProfile] = useState({
-//     fullName: '',
-//     email: '',
-//     address: '',
-//   });
-//   const [favorites, setFavorites] = useState([]); // State for storing favorites data
-//   const [orders, setOrders] = useState([]);
-
-
-//   // Function to verify the user by checking their session
-//   const getUser = async () => {
-//     try {
-//       const response = await axios.get('http://localhost:5000/api/auth/verify', { withCredentials: true });
-//       if (response.data && response.data.success) {
-//         console.log(response.data); // Profile data or success message
-//       } else {
-//         console.error('User verification failed');
-//       }
-//     } catch (error) {
-//       console.error('Failed to verify user:', error.message);
-//     }
-//   };
-
-//   // Fetch user profile and favorites on mount
-//   useEffect(() => {
-//     const fetchProfileAndFavorites = async () => {
-//       try {
-//         // Verify user first
-//         await getUser();
-
-//         // After verifying, fetch the user profile
-//         const profileResponse = await axios.get('http://localhost:5000/api/users/me', {
-//           withCredentials: true,
-//         });
-
-//         const { name, email, address } = profileResponse.data.user;
-
-//         setProfile({
-//           fullName: name,
-//           email,
-//           address,
-//         });
-
-//         // Fetch favorites
-//         const favoritesData = await getFavorites(); // Fetch favorites from backend
-//         setFavorites(favoritesData); // Set the favorites data in state
-
-//       } catch (err) {
-//         console.error('Failed to fetch profile or favorites:', err);
-//       }
-//     };
-
-//     fetchProfileAndFavorites();
-//   }, []);
-
-//   // Handle form field changes
-//   const handleChange = (e) => {
-//     const { name, value } = e.target;
-//     setProfile((prev) => ({ ...prev, [name]: value }));
-//   };
-
-//   // Toggle edit mode
-//   const handleEditToggle = () => {
-//     setIsEditing((prev) => !prev);
-//   };
-
-//   // Save updated user profile
-//   const handleSave = async () => {
-//     try {
-//       const updatedData = {
-//         name: profile.fullName,
-//         email: profile.email,
-//         address: profile.address,
-//       };
-
-//       const response = await axios.put('http://localhost:5000/api/users/update', updatedData, {
-//         withCredentials: true,
-//       });
-
-//       setProfile({
-//         fullName: response.data.user.name,
-//         email: response.data.user.email,
-//         address: response.data.user.address,
-//       });
-
-//       setIsEditing(false);
-//     } catch (err) {
-//       console.error('Failed to update profile:', err);
-//     }
-//   };
-
-//   // Render content based on active tab
-//   const renderContent = () => {
-//     switch (activeTab) {
-//       case 'profile':
-//         return (
-//           <div className="bg-white shadow rounded-lg p-6">
-//             <div className="flex justify-between items-center mb-4">
-//               <h2 className="text-lg font-medium text-[#593825]">Personal Information</h2>
-//               {isEditing ? (
-//                 <button
-//                   onClick={handleSave}
-//                   className="text-sm px-4 py-1 border rounded hover:bg-gray-100 text-[#593825]"
-//                 >
-//                   Save
-//                 </button>
-//               ) : (
-//                 <button
-//                   onClick={handleEditToggle}
-//                   className="text-sm px-4 py-1 border rounded hover:bg-gray-100 text-[#593825]"
-//                 >
-//                   Edit Profile
-//                 </button>
-//               )}
-//             </div>
-//             <div className="grid md:grid-cols-2 gap-6 text-sm text-gray-800">
-//               <div>
-//                 <p className="font-semibold text-[#593825]">Full Name</p>
-//                 {isEditing ? (
-//                   <input
-//                     type="text"
-//                     name="fullName"
-//                     value={profile.fullName}
-//                     onChange={handleChange}
-//                     className="w-full border rounded px-2 py-1"
-//                   />
-//                 ) : (
-//                   <p>{profile.fullName}</p>
-//                 )}
-//               </div>
-//               <div>
-//                 <p className="font-semibold text-[#593825]">Email Address</p>
-//                 {isEditing ? (
-//                   <input
-//                     type="email"
-//                     name="email"
-//                     value={profile.email}
-//                     onChange={handleChange}
-//                     className="w-full border rounded px-2 py-1"
-//                   />
-//                 ) : (
-//                   <p>{profile.email}</p>
-//                 )}
-//               </div>
-//               <div>
-//                 <p className="font-semibold text-[#593825]">Address</p>
-//                 {isEditing ? (
-//                   <input
-//                     type="text"
-//                     name="address"
-//                     value={profile.address}
-//                     onChange={handleChange}
-//                     className="w-full border rounded px-2 py-1"
-//                   />
-//                 ) : (
-//                   <p>{profile.address}</p>
-//                 )}
-//               </div>
-//             </div>
-//           </div>
-//         );
-//       case 'orders':
-//         return (
-//           <div className="bg-white shadow rounded-lg p-6 text-sm text-gray-800">
-//             <h2 className="text-lg font-medium mb-2 text-[#593825]">My Orders</h2>
-//             <p>You have no orders yet.</p>
-//           </div>
-//         );
-//       case 'favorites':
-//         return (
-//           <div className="bg-white shadow rounded-lg p-6 text-sm text-gray-800">
-//             <h2 className="text-lg font-medium mb-2 text-[#593825]">Favorites</h2>
-//             {favorites.length > 0 ? (
-//               <ul>
-//                 {favorites.map((favorite) => (
-//                   <li key={favorite.id} className="mb-2">
-//                     <div className="flex items-center">
-//                       <img src={favorite.image} alt={favorite.name} className="w-16 h-16 object-cover" />
-//                       <span className="ml-4">{favorite.name}</span>
-//                     </div>
-//                   </li>
-//                 ))}
-//               </ul>
-//             ) : (
-//               <p>Your favorite items will appear here.</p>
-//             )}
-//           </div>
-//         );
-//       default:
-//         return null;
-//     }
-//   };
-
-//   return (
-//     <>
-//       <Header />
-//       <div className="max-w-5xl mx-auto px-4 py-8">
-//         <h1 className="text-2xl font-semibold mb-4 text-[#593825]">My Account</h1>
-
-//         <div className="flex flex-wrap gap-2 mb-6 text-sm font-medium">
-//           <button
-//             onClick={() => setActiveTab('profile')}
-//             className={`flex items-center gap-1 border px-4 py-2 rounded-full text-[#593825] ${activeTab === 'profile' ? 'bg-gray-200' : 'hover:bg-[#D63384]'}`}
-//           >
-//             <PersonIcon fontSize="small" /> Profile
-//           </button>
-//           <button
-//             onClick={() => setActiveTab('orders')}
-//             className={`flex items-center gap-1 border px-4 py-2 rounded-full text-[#593825] ${activeTab === 'orders' ? 'bg-gray-200' : 'hover:bg-[#D63384]'}`}
-//           >
-//             <ReceiptLongIcon fontSize="small" /> My Orders
-//           </button>
-//           <button
-//             onClick={() => setActiveTab('favorites')}
-//             className={`flex items-center gap-1 border px-4 py-2 rounded-full text-[#593825] ${activeTab === 'favorites' ? 'bg-gray-200' : 'hover:bg-[#D63384]'}`}
-//           >
-//             <FavoriteBorderIcon fontSize="small" /> Favorites
-//           </button>
-//         </div>
-
-//         {renderContent()}
-//       </div>
-//       <Footer />
-//     </>
-//   );
-// };
-
-// export default AccountProfile;
 
 
 
@@ -267,7 +27,7 @@ const AccountProfile = () => {
 
   const getUser = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/auth/verify', {
+      const response = await axios.get('https://backend-flower-shop.onrender.com/api/auth/verify', {
         withCredentials: true,
       });
       if (!response.data.success) {
@@ -283,7 +43,7 @@ const AccountProfile = () => {
       try {
         await getUser();
 
-        const profileResponse = await axios.get('http://localhost:5000/api/users/me', {
+        const profileResponse = await axios.get('https://backend-flower-shop.onrender.com/api/users/me', {
           withCredentials: true,
         });
 
@@ -320,7 +80,7 @@ const AccountProfile = () => {
   const handleSave = async () => {
     try {
       await axios.put(
-        'http://localhost:5000/api/users/me',
+        'https://backend-flower-shop.onrender.com/api/users/me',
         {
           name: profile.fullName,
           email: profile.email,

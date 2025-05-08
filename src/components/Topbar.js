@@ -1,35 +1,10 @@
-// // Topbar.jsx
-// const Topbar = () => {
-//     return (
-//       <div className="ml-64 h-16 bg-white shadow px-6 flex justify-between items-center">
-//         <h2 className="text-xl font-semibold">Admin Panel</h2>
-//         <button className=" bg-sidebar text-white px-4 py-2 rounded">Logout</button>
-//       </div>
-//     );
-//   };
-  
-//   export default Topbar;
-  
 
-// const Topbar = () => {
-//   return (
-//     <div className="h-16 bg-white shadow px-6 flex items-center justify-between ml-64">
-//       <h2 className="text-xl font-semibold">Admin Dashboard</h2>
-//       <div className="flex items-center space-x-4">
-//         <span>🔔</span>
-//         <span>👤 Admin</span>
-//         <button className=" bg-sidebar text-white px-4 py-2 rounded">Logout</button>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default Topbar;
 
 
 import React from 'react';
 import DarkModeToggle from './DarkModeToggle';
 import NotificationBadge from './NotificationBadge';
+import admin from '../assets/admin.png';
 
 const Topbar = ({ toggleSidebar, toggleDarkMode, darkMode }) => {
   return (
@@ -56,7 +31,7 @@ const Topbar = ({ toggleSidebar, toggleDarkMode, darkMode }) => {
         <NotificationBadge type="envelope" count={5} />
         <div className="flex items-center cursor-pointer !rounded-button whitespace-nowrap">
           <img
-            src="https://public.readdy.ai/ai/img_res/0f16cc7ef47cd62cb0388e34c7943cb2.jpg"
+            src= {admin}
             alt="Admin"
             className="w-8 h-8 rounded-full object-cover"
           />

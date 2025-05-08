@@ -10,7 +10,7 @@ const ProtectedRoute = ({ children, requiredRole }) => {
   useEffect(() => {
     const verifyUserToken = async () => {
       try {
-        const response = await axios.get("/api/auth/verify", { withCredentials: true }); // ✅ Updated to use correct route
+        const response = await axios.get("https://backend-flower-shop.onrender.com/api/auth/verify", { withCredentials: true }); // ✅ Updated to use correct route
         console.log("🔐 [ProtectedRoute] Verified user from backend:", response.data);
         setUser(response.data); // response.data = { id, email, role }
       } catch (error) {

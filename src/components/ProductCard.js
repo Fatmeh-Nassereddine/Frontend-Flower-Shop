@@ -3,6 +3,10 @@ import { FiHeart, FiShoppingCart } from "react-icons/fi";
 import { getUser } from "../api/auth";
 import { useShop } from "../components/context/ShopContext";
 import { toast } from "react-toastify";
+import axios from "axios";
+
+// Set the backend URL
+const BASE_URL = "https://backend-flower-shop.onrender.com/api";
 
 export function ProductCard({
   image,
@@ -14,8 +18,8 @@ export function ProductCard({
   const { addToCart, cartItems } = useShop();
   const [user, setUser] = React.useState(null);
 
+  // Fetch the logged-in user once when the card mounts
   React.useEffect(() => {
-    // Fetch the logged-in user once when the card mounts
     const fetchUser = async () => {
       try {
         const res = await getUser();
@@ -28,33 +32,37 @@ export function ProductCard({
     fetchUser();
   }, []);
 
+  // Handle like/unlike product
   const handleLikeToggle = async () => {
     if (!user?.id) {
       toast.error("Please log in to like items.");
       return;
     }
 
-    const token = localStorage.getItem("token");
-    if (!token) return;
-
     try {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
       if (liked) {
-        await fetch(`/api/favorites/${productId}`, {
-          method: "DELETE",
+        // Remove from favorites
+        await axios.delete(`${BASE_URL}/favorites/${productId}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
         toast.success("Removed from favorites");
       } else {
-        await fetch("/api/favorites", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ productId }),
-        });
+        // Add to favorites
+        await axios.post(
+          `${BASE_URL}/favorites`,
+          { productId },
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
         toast.success("Added to favorites");
       }
     } catch (error) {
@@ -63,6 +71,7 @@ export function ProductCard({
     }
   };
 
+  // Handle add to cart
   const handleAddToCart = async () => {
     if (!user?.id) {
       toast.error("Please log in to add items to your cart.");

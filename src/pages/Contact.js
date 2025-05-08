@@ -26,7 +26,7 @@ export default function ContactPage() {
 
     try {
       const response = await axios.post(
-        'http://localhost:5000/api/contacts/submit',
+        'https://backend-flower-shop.onrender.com/api/contacts/submit',
         {
           first_name: formData.name,
           email: formData.email,
