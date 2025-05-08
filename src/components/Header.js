@@ -332,7 +332,15 @@ function Header() {
           <div className="flex items-center space-x-3">
             {user ? (
               <>
-                <p className="text-white">{user.name}</p>
+              <p
+                onClick={() => navigate('/account')}
+                onKeyDown={(e) => e.keyCode === 13 && navigate('/account')}
+                tabIndex="0"
+                role="button"
+                className="text-white cursor-pointer hover:text-[#B03074] focus:outline-none"
+              >
+                {user.name}
+              </p>
                 <p
                   onClick={logout}
                   onKeyDown={(e) => e.keyCode === 13 && logout()}

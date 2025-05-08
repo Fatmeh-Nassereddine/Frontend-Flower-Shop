@@ -4,6 +4,9 @@ import { getProductsByCategory } from "../api/apiProducts"; // Adjust path if ne
 import { getCategoryById } from "../api/apiCategories"; // Adjust path if needed
 import Header from "../components/Header"; 
 import Footer from "../components/Footer"; 
+import { Link } from "react-router-dom"; // ✅ Add this at the top if not already
+import QuickViewModal from "../components/ui/QuickViewModal";
+import { useShop } from "../components/context/ShopContext";
 
 export default function ProductsByCategoryPage() {
   const { categoryId } = useParams(); // ✅ Fix: Get categoryId from route
@@ -11,6 +14,16 @@ export default function ProductsByCategoryPage() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(""); // New state for errors
+
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const { addToCart } = useShop(); // Get addToCart from context
+
+  const handleQuickView = (product) => {
+    setSelectedProduct(product);
+    setIsModalOpen(true);
+  };
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -57,18 +70,39 @@ export default function ProductsByCategoryPage() {
           Products in {categoryName || "Category"}
         </h1>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          {products.map((product) => (
-            <div key={product.product_id} className="bg-white rounded-lg shadow p-4">
-              <img
-                src={product.image_url || "/placeholder.jpg"} // Fallback image
-                alt={product.name}
-                className="w-full h-64 object-cover rounded-lg mb-4"
-              />
-              <h2 className="text-xl font-semibold text-[#593825]">{product.name}</h2>
-              <p className="text-gray-600 mb-2">{product.description}</p>
-              <span className="text-[#593825] font-bold">${product.price}</span>
-            </div>
-          ))}
+        {products.map((product) => (
+  <div
+    key={product.product_id}
+    className="bg-white rounded-lg shadow p-4 hover:shadow-lg transition group"
+  >
+    <Link to={`/product/${product.product_id}`}>
+      <div className="overflow-hidden rounded-lg mb-4">
+        <img
+          src={product.image_url || "/placeholder.jpg"}
+          alt={product.name}
+          className="w-full h-64 object-cover transform transition-transform duration-300 group-hover:scale-110"
+        />
+      </div>
+    </Link>
+
+        <h2 className="text-xl font-semibold text-[#593825]">{product.name}</h2>
+        <p className="text-gray-600 mb-2">{product.description}</p>
+       <span className="text-[#593825] font-bold block mb-3">${product.price}</span>
+
+        <button
+      onClick={() => handleQuickView(product)}
+      className="text-sm text-indigo-600 underline hover:text-indigo-800"
+      >
+        Quick View
+        </button>
+      </div>
+       ))}
+       <QuickViewModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        product={selectedProduct}
+        onAddToCart={addToCart}
+      />
         </div>
       </div>
       <Footer /> {/* Assuming you have a Footer component */}

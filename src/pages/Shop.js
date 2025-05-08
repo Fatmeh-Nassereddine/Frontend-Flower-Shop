@@ -1,7 +1,3 @@
-
-
-
-
 import React, { useEffect, useState, useCallback } from "react";
 import { ProductCard } from "../components/ProductCard";
 import { getAllProducts } from "../api/apiProducts";
@@ -36,9 +32,6 @@ function Shop() {
     try {
       const categoriesData = await getAllCategories();
       const seasonsData = await apiSeasons.getAll();
-
-      console.log("📦 Categories Data:", categoriesData);
-      console.log("❄️ Seasons Data:", seasonsData);
       setCategories(categoriesData);
       setSeasons(seasonsData);
     } catch (error) {
@@ -57,8 +50,6 @@ function Shop() {
         searchQuery,
         priceRange
       );
-  
-      // ✅ Now result is already the actual data
       setProducts(result.data || []);
       setTotalPages(result.totalPages || 1);
     } catch (error) {
@@ -67,9 +58,6 @@ function Shop() {
       setLoading(false);
     }
   };
-  
-  
-  
 
   useEffect(() => {
     fetchCategoriesAndSeasons();
@@ -85,13 +73,11 @@ function Shop() {
       const updated = prev.includes(id)
         ? prev.filter((catId) => catId !== id)
         : [...prev, id];
-      console.log('Updated Categories:', updated); // Debugging log
       return updated;
     });
     setPage(1);
   };
-  
-  
+
   const handleSeasonChange = (id) => {
     setSelectedSeasons((prev) => {
       const updated = prev.includes(id)
@@ -101,7 +87,6 @@ function Shop() {
     });
     setPage(1);
   };
-  
 
   const debouncedSearch = useCallback(
     debounce((value) => {
@@ -133,8 +118,9 @@ function Shop() {
   return (
     <div className="font-sans bg-gray-100">
       <Header />
-      <div className="flex">
-        <aside className="w-[300px] pr-5 max-sm:w-full hidden lg:block bg-white p-4">
+      <div className="flex flex-wrap md:flex-nowrap">
+        {/* Sidebar */}
+        <aside className="w-full md:w-[300px] lg:w-[300px] xl:w-[300px] pr-5 bg-white p-4 md:block md:h-auto">
           <SearchInput onChange={debouncedSearch} />
           <PriceRange min={0} max={200} onChange={debouncedPrice} />
 
@@ -190,6 +176,7 @@ function Shop() {
           </div>
         </aside>
 
+        {/* Product Listings */}
         <main className="flex-1 p-4">
           {loading ? (
             <div className="text-center text-gray-600">Loading products...</div>
@@ -199,17 +186,17 @@ function Shop() {
             <>
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                 {products.map((product) => (
-                  <Link to={`/product/${product.product_id}`} key={product.product_id}> {/* Link to the product details page */}
-                  <ProductCard
-                    productId={product.product_id}
-                    title={product.name}
-                    price={product.price}
-                    image={product.images?.[0]?.image_url || "/placeholder.jpg"}
-                    liked={likedItems.includes(product.product_id)}
-                    cartItems={cartItems.map((item) => item.id)}
-                    updateCartItems={onAddToCart}
-                    updateFavorites={onLikeToggle}
-                  />
+                  <Link to={`/product/${product.product_id}`} key={product.product_id}>
+                    <ProductCard
+                      productId={product.product_id}
+                      title={product.name}
+                      price={product.price}
+                      image={product.images?.[0]?.image_url || "/placeholder.jpg"}
+                      liked={likedItems.includes(product.product_id)}
+                      cartItems={cartItems.map((item) => item.id)}
+                      updateCartItems={onAddToCart}
+                      updateFavorites={onLikeToggle}
+                    />
                   </Link>
                 ))}
               </div>

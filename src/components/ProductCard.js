@@ -1,8 +1,8 @@
-
 import * as React from "react";
 import { FiHeart, FiShoppingCart } from "react-icons/fi";
 import { getUser } from "../api/auth";
-import axios from "axios";
+import { useShop } from "../components/context/ShopContext";
+import { toast } from "react-toastify";
 
 export function ProductCard({
   image,
@@ -10,62 +10,76 @@ export function ProductCard({
   price,
   liked,
   productId,
-  cartItems,
-  updateCartItems,
-  updateFavorites,
 }) {
-  const handleLikeToggle = async () => {
-    try {
-      const user = await getUser();
-      if (!user?.id) {
-        console.error("User not authenticated");
-        return;
-      }
+  const { addToCart, cartItems } = useShop();
+  const [user, setUser] = React.useState(null);
 
+  React.useEffect(() => {
+    // Fetch the logged-in user once when the card mounts
+    const fetchUser = async () => {
+      try {
+        const res = await getUser();
+        setUser(res);
+      } catch (error) {
+        console.error("Error fetching user:", error);
+        setUser(null);
+      }
+    };
+    fetchUser();
+  }, []);
+
+  const handleLikeToggle = async () => {
+    if (!user?.id) {
+      toast.error("Please log in to like items.");
+      return;
+    }
+
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    try {
       if (liked) {
-        await axios.delete(`/api/favorites/${productId}`, {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        await fetch(`/api/favorites/${productId}`, {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         });
-        updateFavorites(productId, false);
+        toast.success("Removed from favorites");
       } else {
-        await axios.post(
-          "/api/favorites",
-          { productId },
-          {
-            headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-          }
-        );
-        updateFavorites(productId, true);
+        await fetch("/api/favorites", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ productId }),
+        });
+        toast.success("Added to favorites");
       }
     } catch (error) {
-      console.error("Error toggling favorite:", error);
+      toast.error("Failed to update favorites.");
+      console.error("Favorite error:", error);
     }
   };
 
   const handleAddToCart = async () => {
-    try {
-      const user = await getUser();
-      if (!user?.id) {
-        console.error("User not authenticated");
-        return;
-      }
+    if (!user?.id) {
+      toast.error("Please log in to add items to your cart.");
+      return;
+    }
 
-      await axios.post(
-        "/api/cart/add",
-        {
-          user_id: user.id,
-          product_id: productId,
-          quantity: 1,
-        },
-        {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-        }
-      );
-      updateCartItems(productId, true);
+    try {
+      await addToCart(productId);
     } catch (error) {
-      console.error("Error adding to cart:", error);
+      toast.error("Failed to add item to cart.");
+      console.error("Cart error:", error);
     }
   };
+
+  const isInCart = cartItems?.some(
+    (item) => item.product_id === productId || item.id === productId
+  );
 
   return (
     <div className="flex flex-col items-center text-center border p-4 rounded-lg shadow-lg">
@@ -81,13 +95,17 @@ export function ProductCard({
         <button
           onClick={handleLikeToggle}
           className={`text-2xl ${liked ? "text-red-500" : "text-gray-500"}`}
+          title={!user ? "Log in to like items" : "Add to favorites"}
         >
           <FiHeart />
         </button>
 
         <button
           onClick={handleAddToCart}
-          className={`text-2xl ${cartItems?.includes(productId) ? "text-green-500" : "text-gray-500"}`}
+          className={`text-2xl ${
+            isInCart ? "text-green-500" : "text-gray-500"
+          }`}
+          title={!user ? "Log in to add to cart" : "Add to cart"}
         >
           <FiShoppingCart />
         </button>

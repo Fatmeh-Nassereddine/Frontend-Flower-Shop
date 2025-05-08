@@ -82,22 +82,31 @@ import axios from "axios";
 axios.defaults.baseURL = "http://localhost:5000";
 axios.defaults.withCredentials = true;
 
-const API_URL = "/api";
 
-// Login
+
+
+//Login 
+
+// authService.js
 export const login = async (email, password) => {
   try {
-    const response = await axios.post(`${API_URL}/auth/login`, { email, password });
-    return response.data;
+    const response = await axios.post(`http://localhost:5000/api/auth/login`, { email, password }, {
+      withCredentials: true // Ensure cookies are sent with the request
+    });
+
+    // Store the user in a state or context instead of localStorage
+    return response.data.user;
   } catch (error) {
-    throw new Error(error.response?.data?.error || "Login failed");
+    throw error;
   }
 };
+
+
 
 // Register
 export const register = async (name, email, password, address) => {
   try {
-    const response = await axios.post(`${API_URL}/auth/register`, { name, email, password, address });
+    const response = await axios.post(`http://localhost:5000/api/auth/register`, { name, email, password, address });
     return response.data;
   } catch (error) {
     throw new Error(error.response?.data?.error || "Registration failed");
@@ -107,7 +116,7 @@ export const register = async (name, email, password, address) => {
 // Logout
 export const logout = async () => {
   try {
-    const response = await axios.post(`${API_URL}/auth/logout`);
+    const response = await axios.post(`http://localhost:5000/api/auth/logout`);
     return response.data;
   } catch (error) {
     throw new Error(error.response?.data?.error || "Logout failed");
@@ -117,10 +126,26 @@ export const logout = async () => {
 // Get the current logged-in user (based on session cookie)
 export const getUser = async () => {
   try {
-    const response = await axios.get(`${API_URL}/auth/verify`);
-    return response.data; // should include user.id, email, etc.
+    const response = await axios.get(`http://localhost:5000/api/auth/verify`, {
+      withCredentials: true, // 👈 send cookies!
+    });
+
+    return response.data;
   } catch (error) {
-    throw new Error(error.response?.data?.error || "Failed to fetch user");
+    console.error("Error fetching user:", error); // Log error for debugging
+    throw new Error("Failed to authenticate the user");
   }
 };
 
+
+
+
+// Login
+// export const login = async (email, password) => {
+//   try {
+//     const response = await axios.post(`${API_URL}/auth/login`, { email, password });
+//     return response.data;
+//   } catch (error) {
+//     throw new Error(error.response?.data?.error || "Login failed");
+//   }
+// };

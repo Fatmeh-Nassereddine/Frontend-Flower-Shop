@@ -1,83 +1,189 @@
 import * as React from "react";
-import PrimaryButton from "../components/PrimaryButton";
 import { Heart, ShoppingCart } from "lucide-react";
 import { Link } from "react-router-dom";
+import Header from "../components/Header";
+import Footer from "../components/Footer";
 
-
-// Sample favorites - in a real app would come from context or state management
-const initialFavorites = [
-  { id: 2, image: "", title: "Bird's Nest Fern", price: 25 },
-  { id: 8, image: "", title: "Bride's bouquet", price: 40 },
-  { id: 11, image: "", title: "Peperomia Ginny", price: 25 },
-];
+// API functions
+import {
+  getFavorites as fetchApiFavorites,
+  removeFavorite as removeApiFavorite,
+} from "../api/apiFavorite";
 
 export default function FavoritesPage() {
-  const [favorites, setFavorites] = React.useState(initialFavorites);
-  
-  const removeFromFavorites = (id) => {
-    setFavorites((items) => items.filter((item) => item.id !== id));
+  const [favorites, setFavorites] = React.useState([]);
+  const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState(null);
+
+  React.useEffect(() => {
+    const loadFavorites = async () => {
+      try {
+        const data = await fetchApiFavorites();
+        setFavorites(data || []);
+      } catch (err) {
+        setError("Failed to load favorites. Please try again later.");
+        console.error("Error loading favorites:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadFavorites();
+  }, []);
+
+  const removeFromFavorites = async (product_id) => {
+    try {
+      await removeApiFavorite(product_id);
+      setFavorites((items) =>
+        items.filter((item) => item.product_id !== product_id)
+      );
+    } catch (error) {
+      console.error("Error removing favorite:", error);
+      setError("Failed to remove item from favorites");
+    }
   };
-  
-  const addToCart = (id) => {
-    // In a real app, would dispatch to cart context or state
-    console.log(`Added item ${id} to cart`);
+
+  const addToCart = (product_id) => {
+    console.log(`Added item ${product_id} to cart`);
   };
-  
+
+  const buttonStyles = {
+    base:
+      "font-hina font-medium px-3 py-1.5 rounded-full transition duration-300 flex items-center justify-center gap-2 text-sm sm:text-sm",
+    solid: "bg-[#D63384] text-white hover:bg-[#B03074]",
+    outline:
+      "border-2 border-[#593825] text-white bg-[#9E9A9C] hover:bg-[#8c888a]",
+  };
+
+  const inlineSolidStyle = {
+    backgroundColor: "#D63384",
+    color: "#FFFFFF",
+  };
+
+  const inlineHoverSolidStyle = {
+    backgroundColor: "#B03074",
+  };
+
+  if (loading) {
+    return (
+      <div className="container mx-auto px-4 py-5">
+        <Header />
+        <div className="text-center py-12">
+          <p className="text-gray-600">Loading favorites...</p>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
   return (
-    <div className="container mx-auto p-5">
-      <h1 className="text-3xl font-semibold mb-8 text-[#593825] font-hina">Your Favorites</h1>
-      
+    <div className="container mx-auto px-4 py-5">
+      <Header />
+
+      <h1 className="text-2xl sm:text-3xl font-semibold mb-6 text-[#593825] font-hina text-center">
+        Your Favorites
+      </h1>
+
+      {error && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
+          {error}
+        </div>
+      )}
+
       {favorites.length === 0 ? (
         <div className="text-center py-12">
-          <h2 className="text-2xl mb-4 text-[#593825] font-hina">Your favorites list is empty</h2>
-          <p className="mb-6 text-gray-600 font-hina">Add items to your favorites while shopping and they will appear here</p>
+          <h2 className="text-xl sm:text-2xl mb-4 text-[#593825] font-hina">
+            Your favorites list is empty
+          </h2>
+          <p className="mb-6 text-gray-600 font-hina text-sm sm:text-base">
+            Add items to your favorites while shopping and they will appear here.
+          </p>
           <Link to="/">
-            <PrimaryButton className="bg-[#593825] hover:bg-[#472c1d] text-white">
+            <button
+              className="font-hina font-semibold px-6 py-2 rounded-full transition duration-300 text-white text-sm sm:text-base"
+              style={inlineSolidStyle}
+              onMouseOver={(e) =>
+                (e.target.style.backgroundColor =
+                  inlineHoverSolidStyle.backgroundColor)
+              }
+              onMouseOut={(e) =>
+                (e.target.style.backgroundColor =
+                  inlineSolidStyle.backgroundColor)
+              }
+            >
               Browse Products
-            </PrimaryButton>
+            </button>
           </Link>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {favorites.map(item => (
-            <div key={item.id} className="bg-white rounded-lg shadow overflow-hidden">
-              <Link to={`/product/${item.id}`}>
-                <img 
-                  src={item.image || "/path/to/default-image.jpg"}  // Fallback image
-                  alt={item.title || "Product"}  // Fallback alt text
-                  className="w-full h-64 object-cover"
-                />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {favorites.map((item) => (
+            <div
+              key={item.product_id}
+              className="bg-white rounded-lg shadow overflow-hidden transition-transform hover:shadow-lg flex flex-col max-w-sm mx-auto w-full"
+            >
+              <Link to={`/product/${item.product_id}`} className="block relative">
+                {/* Image Container */}
+                <div className="w-full h-64 flex justify-center items-center overflow-hidden relative">
+                  <img
+                    src={item.image_url || "/images/default-product.jpg"}
+                    alt={item.name || "Product"}
+                    className="object-contain transition-transform duration-300 hover:scale-110"
+                    style={{
+                      maxHeight: "100%",
+                      maxWidth: "100%",
+                      transformOrigin: "center", // Ensures zooming happens from the center
+                    }}
+                  />
+                </div>
               </Link>
-              
-              <div className="p-4">
-                <Link to={`/product/${item.id}`}>
-                  <h2 className="font-semibold text-lg mb-2 text-[#593825] font-hina">{item.title}</h2>
-                </Link>
-                <p className="text-gray-700 mb-4 text-[#593825] font-hina">${item.price.toFixed(2)}</p>
-                
-                <div className="flex gap-2">
-                  <PrimaryButton 
-                    onClick={() => addToCart(item.id)}
-                    className="flex-1 bg-[#593825] hover:bg-[#472c1d] flex items-center justify-center gap-2 text-white"
+
+              {/* Product Details */}
+              <div className="p-4 flex flex-col justify-between h-full">
+                <div>
+                  <Link to={`/product/${item.product_id}`} className="block">
+                    <h2 className="font-semibold text-lg mb-2 text-[#593825] font-hina">
+                      {item.name}
+                    </h2>
+                  </Link>
+                  <p className="text-gray-700 mb-4 text-[#593825] font-hina">
+                    ${Number(item.price)?.toFixed(2) || "0.00"}
+                  </p>
+                </div>
+
+                <div className="flex flex-col sm:flex-row gap-2 mt-auto">
+                  <button
+                    onClick={() => addToCart(item.product_id)}
+                    className={`${buttonStyles.base} ${buttonStyles.solid}`}
+                    style={inlineSolidStyle}
+                    onMouseOver={(e) =>
+                      (e.target.style.backgroundColor =
+                        inlineHoverSolidStyle.backgroundColor)
+                    }
+                    onMouseOut={(e) =>
+                      (e.target.style.backgroundColor =
+                        inlineSolidStyle.backgroundColor)
+                    }
                   >
-                    <ShoppingCart size={18} />
+                    <ShoppingCart size={16} />
                     Add to Cart
-                  </PrimaryButton>
-                  
-                  <PrimaryButton 
-                    variant="outline" 
-                    onClick={() => removeFromFavorites(item.id)}
-                    className="flex items-center justify-center text-[#593825] border-[#593825] border-2"
+                  </button>
+
+                  <button
+                    onClick={() => removeFromFavorites(item.product_id)}
+                    className={`${buttonStyles.base} ${buttonStyles.outline}`}
                   >
-                    <Heart size={18} className="fill-[#593825] text-[#593825]" />
-                  </PrimaryButton>
+                    <Heart size={16} className="text-white" />
+                    Remove
+                  </button>
                 </div>
               </div>
             </div>
           ))}
         </div>
       )}
+
+      <Footer />
     </div>
   );
 }
-

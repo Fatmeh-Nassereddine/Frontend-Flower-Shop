@@ -1,25 +1,28 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom"; // Change useHistory to useNavigate
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { Heart, ShoppingCart } from "lucide-react";
-import { useShop } from "../components/context/ShopContext"; // Corrected import
+import { useShop } from "../components/context/ShopContext";
 import PrimaryButton from "../components/PrimaryButton";
-import { getProductById } from "../api/apiProducts"; // ✅ New dynamic import
+import { getProductById } from "../api/apiProducts";
+import { toast } from "sonner";
+import { getUser } from "../api/auth"; // Import getUser function to check login status
 
 export default function ProductPage() {
-  const { id } = useParams();
-  const productId = id;
-
+  const { id: productId } = useParams();
   const [product, setProduct] = useState(null);
+  const [quantity, setQuantity] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const [quantity, setQuantity] = useState(1);
   const { cartItems, likedItems, addToCart, toggleLike } = useShop();
+  const navigate = useNavigate(); // Use useNavigate to handle redirects
 
-  const isLiked = likedItems.includes(productId);
-  const isInCart = cartItems.some((item) => item.id === productId); // Check if product is in cart
+  const isLiked = likedItems.includes(productId);  // Check if product is liked
+  const isInCart = cartItems.some(
+    (item) => item.id === productId || item.product_id === productId
+  );
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -28,6 +31,7 @@ export default function ProductPage() {
         setProduct(data);
       } catch (err) {
         setError("Failed to load product details.");
+        toast.error(err.message || "Failed to fetch product.");
       } finally {
         setLoading(false);
       }
@@ -36,23 +40,48 @@ export default function ProductPage() {
     fetchProduct();
   }, [productId]);
 
-  const handleAddToCart = () => {
-    for (let i = 0; i < quantity; i++) {
-      addToCart(productId); // Add product to cart with specified quantity
+  // Check if the user is logged in before allowing add to cart or like toggle
+  const isUserLoggedIn = async () => {
+    try {
+      const user = await getUser(); // Check if user is logged in
+      return user?.id ? true : false; // Return true if user is logged in
+    } catch (err) {
+      return false; // Return false if getUser fails (user not logged in)
     }
   };
 
-  const handleLikeToggle = () => {
-    toggleLike(productId); // Toggle like status for the product
+  const handleAddToCart = async () => {
+    const loggedIn = await isUserLoggedIn();
+    if (!loggedIn) {
+      toast.error("Please log in to add items to your cart.");
+      navigate("/login"); // Redirect to login page using navigate
+      return;
+    }
+
+    try {
+      for (let i = 0; i < quantity; i++) {
+        await addToCart(productId); // ✅ Add product to cart
+      }
+    } catch {
+      toast.error("Failed to add product to cart.");
+    }
   };
 
-  if (loading) {
-    return <div className="text-center p-10">Loading product...</div>;
-  }
+  const handleLikeToggle = async () => {
+    const loggedIn = await isUserLoggedIn();
+    if (!loggedIn) {
+      toast.error("Please log in to add items to your favorites.");
+      navigate("/login"); // Redirect to login page using navigate
+      return;
+    }
 
-  if (error || !product) {
+    console.log("Toggling like for productId:", productId);
+    toggleLike(productId);  // Toggle like for the product
+  };
+
+  if (loading) return <div className="text-center p-10">Loading product...</div>;
+  if (error || !product)
     return <div className="text-center text-red-600 p-10">{error}</div>;
-  }
 
   return (
     <>
@@ -102,10 +131,12 @@ export default function ProductPage() {
                 }
               />
               <PrimaryButton
-                onClick={handleLikeToggle}
+                onClick={handleLikeToggle}  // Handle the like toggle
                 text={
                   <>
-                    <Heart className={`h-5 w-5 inline-block mr-2 ${isLiked ? "fill-[#fff]" : ""}`} />
+                    <Heart
+                      className={`h-5 w-5 inline-block mr-2 ${isLiked ? "fill-[#fff]" : ""}`}
+                    />
                     {isLiked ? "Liked" : "Add to Favorites"}
                   </>
                 }

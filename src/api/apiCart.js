@@ -1,10 +1,20 @@
 import axios from 'axios';
 
-// Set the base URL for your API if necessary
-const BASE_URL = 'http://localhost:5000/api/cart';  // Change to your actual API URL
+// Ensure cookies are sent with every request
+axios.defaults.withCredentials = true;
 
-// Function to add or update a product in the cart
-export const addProductToCart = async (user_id, product_id, quantity) => {
+// Base API endpoint
+const BASE_URL = 'http://localhost:5000/api/carts';
+
+// Centralized error handler
+const handleError = (error) => {
+  const errorMessage = error.response?.data?.message || error.message || 'An unknown error occurred.';
+  console.error("Cart API Error:", errorMessage);
+  throw new Error(errorMessage);
+};
+
+// Add or update product in the cart
+export const addProductToCart = async (user_id, product_id, quantity = 1) => {
   try {
     const response = await axios.post(`${BASE_URL}/add`, {
       user_id,
@@ -13,34 +23,32 @@ export const addProductToCart = async (user_id, product_id, quantity) => {
     });
     return response.data;
   } catch (error) {
-    console.error("Error adding product to cart:", error.message);
-    throw error;
+    handleError(error);
   }
 };
 
-// Function to remove a product from the cart
+// Remove product from cart
 export const removeProductFromCart = async (cart_item_id) => {
   try {
     const response = await axios.delete(`${BASE_URL}/remove/${cart_item_id}`);
     return response.data;
   } catch (error) {
-    console.error("Error removing product from cart:", error.message);
-    throw error;
+    handleError(error);
   }
 };
 
-// Function to get the user's cart (all products and total price)
+// Get all cart items for a user
 export const getUserCart = async (user_id) => {
   try {
     const response = await axios.get(`${BASE_URL}/${user_id}`);
     return response.data;
   } catch (error) {
-    console.error("Error fetching cart:", error.message);
-    throw error;
+    console.error("Cart API Error:", error.response?.data || error.message);
+    handleError(error);
   }
 };
 
-// Function to update the quantity of a cart item
+// Update quantity for a specific cart item
 export const updateItemQuantity = async (cart_item_id, quantity) => {
   try {
     const response = await axios.put(`${BASE_URL}/update/${cart_item_id}`, {
@@ -48,18 +56,16 @@ export const updateItemQuantity = async (cart_item_id, quantity) => {
     });
     return response.data;
   } catch (error) {
-    console.error("Error updating item quantity:", error.message);
-    throw error;
+    handleError(error);
   }
 };
 
-// Function to clear the entire cart for a user
+// Clear all items in a user's cart
 export const clearUserCart = async (user_id) => {
   try {
     const response = await axios.delete(`${BASE_URL}/clear/${user_id}`);
     return response.data;
   } catch (error) {
-    console.error("Error clearing the cart:", error.message);
-    throw error;
+    handleError(error);
   }
 };

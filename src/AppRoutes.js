@@ -1,18 +1,16 @@
-// AppRoutes.js
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { useAuth } from './hooks/AuthContext'; 
-import Sidebar from './components/Sidebar';
-import Topbar from './components/Topbar';
 import ProtectedRoute from './Route/ProtectedRoute';
 import Loader from './components/Loader/Loader';
 import NotFound from './pages/NotFound';
 
 // Admin Pages
 import Dashboard from './pages/Admin/Dashboard';
+import DashboardHome from './pages/Admin/DashboardHome';
 import ProductList from './pages/Admin/Products/ProductList';
-import AddProduct from './pages/Admin/Products/AddProduct';
-import EditProduct from './pages/Admin/Products/EditProduct';
+// import AddProduct from './pages/Admin/Products/AddProduct';
+// import EditProduct from './pages/Admin/Products/EditProduct';
 import OrderList from './pages/Admin/Orders/OrderList';
 import CategoryList from './pages/Admin/Categories/CategoryList';
 import UserList from './pages/Admin/Users/UserList';
@@ -32,8 +30,10 @@ import Favorite from './pages/Favorite';
 import CategoryPage from './pages/CategoryPage';
 import ProductPage from './pages/ProductPage';
 import LoginUp from './components/popAuth/LoginUp';
-import ProductsByCategoryPage from "./pages/ProductsByCategoryPage"; 
-
+import ProductsByCategoryPage from './pages/ProductsByCategoryPage'; 
+import CheckoutPage from './pages/Checkout';
+import ThankYouPage from './pages/ThankYouPage';
+import AccountProfile from './pages/AccountProfile';
 
 function AppRoutes({ darkMode, toggleSidebar, toggleDarkMode, sidebarCollapsed, activeTab, setActiveTab }) {
   const { loading } = useAuth();
@@ -56,45 +56,40 @@ function AppRoutes({ darkMode, toggleSidebar, toggleDarkMode, sidebarCollapsed, 
       <Route path="/product/:id" element={<ProductPage />} />
       <Route path="/login" element={<LoginUp />} />
       <Route path="/category/:categoryId" element={<ProductsByCategoryPage />} /> 
+      <Route path="/checkout" element={<CheckoutPage />} />
+      <Route path="/thank-you" element={<ThankYouPage />} />
+      <Route path="/account" element={<AccountProfile />} />
 
       {/* Admin Dashboard Layout */}
       <Route path="/dashboard/*" element={
-        <div className={`flex ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-100'}`}>
-          <Sidebar
-            sidebarCollapsed={sidebarCollapsed}
-            setActiveTab={setActiveTab}
-            toggleSidebar={toggleSidebar}
+        <ProtectedRoute requiredRole="admin">
+          <Dashboard
             darkMode={darkMode}
+            toggleSidebar={toggleSidebar}
+            toggleDarkMode={toggleDarkMode}
+            sidebarCollapsed={sidebarCollapsed}
             activeTab={activeTab}
+            setActiveTab={setActiveTab}
           />
-          <div className={`flex-1 ${sidebarCollapsed ? 'ml-20' : 'ml-64'} transition-all duration-300`}>
-            <Topbar
-              toggleSidebar={toggleSidebar}
-              toggleDarkMode={toggleDarkMode}
-              darkMode={darkMode}
-            />
-            <div className="p-6 mt-4">
-              <Routes>
-                <Route path="" element={<ProtectedRoute requiredRole="admin"><Dashboard /></ProtectedRoute>} />
-                <Route path="products" element={<ProtectedRoute requiredRole="admin"><ProductList /></ProtectedRoute>} />
-                <Route path="products/add" element={<ProtectedRoute requiredRole="admin"><AddProduct /></ProtectedRoute>} />
-                <Route path="products/edit/:id" element={<ProtectedRoute requiredRole="admin"><EditProduct /></ProtectedRoute>} />
-                <Route path="orders" element={<ProtectedRoute requiredRole="admin"><OrderList /></ProtectedRoute>} />
-                <Route path="category" element={<ProtectedRoute requiredRole="admin"><CategoryList /></ProtectedRoute>} />
-                <Route path="users" element={<ProtectedRoute requiredRole="admin"><UserList /></ProtectedRoute>} />
-                <Route path="reviews" element={<ProtectedRoute requiredRole="admin"><ReviewList /></ProtectedRoute>} />
-                <Route path="discounts" element={<ProtectedRoute requiredRole="admin"><DiscountList /></ProtectedRoute>} />
-                <Route path="messages" element={<ProtectedRoute requiredRole="admin"><MessageList /></ProtectedRoute>} />
-                <Route path="settings" element={<ProtectedRoute requiredRole="admin"><AdminSettings /></ProtectedRoute>} />
-              
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </div>
-          </div>
-        </div>
-      } />
+        </ProtectedRoute>
+      }>
+        {/* Nested Admin Routes */}
+        <Route index element={<DashboardHome />} />
+        <Route path="products" element={<ProductList />} />
+        {/* <Route path="products/add" element={<AddProduct />} />
+        <Route path="products/edit/:id" element={<EditProduct />} /> */}
+        <Route path="orders" element={<OrderList />} />
+        <Route path="category" element={<CategoryList />} />
+        <Route path="users" element={<UserList />} />
+        <Route path="reviews" element={<ReviewList />} />
+        <Route path="discounts" element={<DiscountList />} />
+        <Route path="messages" element={<MessageList />} />
+        <Route path="settings" element={<AdminSettings />} />
+        <Route path="*" element={<NotFound />} />
+      </Route>
     </Routes>
   );
 }
 
 export default AppRoutes;
+
