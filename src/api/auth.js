@@ -89,7 +89,7 @@ axios.defaults.withCredentials = true;
 // Login
 export const login = async (email, password) => {
   try {
-    const response = await axios.post("https://backend-flower-shop.onrender.com/api/auth/login", { email, password });
+    const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/auth/login`, { email, password });
     return response.data.user;
   } catch (error) {
     console.error("Error during login:", error);
@@ -100,7 +100,7 @@ export const login = async (email, password) => {
 // Register
 export const register = async (name, email, password, address) => {
   try {
-    const response = await axios.post("https://backend-flower-shop.onrender.com/api/auth/register", { name, email, password, address });
+    const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/auth/register`, { name, email, password, address });
     return response.data;
   } catch (error) {
     console.error("Error during registration:", error);
@@ -111,7 +111,7 @@ export const register = async (name, email, password, address) => {
 // Logout
 export const logout = async () => {
   try {
-    const response = await axios.post("https://backend-flower-shop.onrender.com/api/auth/logout");
+    const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/auth/logout`);
     return response.data;
   } catch (error) {
     console.error("Error during logout:", error);
@@ -122,7 +122,7 @@ export const logout = async () => {
 // Get the current logged-in user (based on session cookie)
 export const getUser = async () => {
   try {
-    const response = await axios.get("https://backend-flower-shop.onrender.com/api/auth/verify");
+    const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/auth/verify`);
     return response.data;
   } catch (error) {
     console.error("Error fetching user:", error);

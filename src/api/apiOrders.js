@@ -40,7 +40,7 @@ export const getAllOrders = async () => {
 // 3. Get orders for logged-in user
 export const getUserOrders = async () => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/user`);
+    const response = await axios.get(`${API_BASE_URL}/my-orders`);
     return { error: false, data: response.data };
   } catch (error) {
     return handleError(error);
@@ -60,7 +60,7 @@ export const getOrderItemsByOrderId = async (order_id) => {
 // 5. Get order items by user (full order history with products)
 export const getOrderItemsByUser = async () => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/items/user`);
+    const response = await axios.get(`${API_BASE_URL}/my-orderItems`);
     return { error: false, data: response.data };
   } catch (error) {
     return handleError(error);
@@ -70,7 +70,7 @@ export const getOrderItemsByUser = async () => {
 // 6. Cancel order (admin only)
 export const cancelOrder = async (order_id) => {
   try {
-    const response = await axios.patch(`${API_BASE_URL}/cancel/${order_id}`);
+    const response = await axios.patch(`${API_BASE_URL}/${order_id}/cancel`);
     return { error: false, data: response.data };
   } catch (error) {
     return handleError(error);
@@ -80,7 +80,7 @@ export const cancelOrder = async (order_id) => {
 // 7. Delete order (admin only)
 export const deleteOrder = async (order_id) => {
   try {
-    const response = await axios.delete(`${API_BASE_URL}/${order_id}`);
+    const response = await axios.delete(`${API_BASE_URL}/${order_id}/delete`);
     return { error: false, data: response.data };
   } catch (error) {
     return handleError(error);
@@ -100,7 +100,7 @@ export const updateOrderStatus = async (order_id, status) => {
 // 9. Update order item quantity
 export const updateOrderItemQuantity = async (order_item_id, quantity) => {
   try {
-    const response = await axios.put(`${API_BASE_URL}/items/${order_item_id}`, { quantity });
+    const response = await axios.put(`${API_BASE_URL}/item/${order_item_id}`, { quantity });
     return { error: false, data: response.data };
   } catch (error) {
     return handleError(error);
@@ -108,9 +108,9 @@ export const updateOrderItemQuantity = async (order_item_id, quantity) => {
 };
 
 // 10. Delete order item
-export const deleteOrderItem = async (order_item_id) => {
+export const deleteOrderItem = async (order_id,order_item_id) => {
   try {
-    const response = await axios.delete(`${API_BASE_URL}/items/${order_item_id}`);
+    const response = await axios.delete(`${API_BASE_URL}/${order_id}/item/${order_item_id}`);
     return { error: false, data: response.data };
   } catch (error) {
     return handleError(error);

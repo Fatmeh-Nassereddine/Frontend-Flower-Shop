@@ -77,7 +77,7 @@ const handleApiError = (error, defaultMessage) => {
 // ✅ Get all favorites for the logged-in user
 export const getFavorites = async () => {
   try {
-    const response = await api.get('https://backend-flower-shop.onrender.com/api/favorites');
+    const response = await api.get('/');
     return response.data;
   } catch (error) {
     handleApiError(error, 'Failed to load favorites');
@@ -87,7 +87,7 @@ export const getFavorites = async () => {
 // ✅ Add a product to favorites
 export const addFavorite = async (product_id) => {
   try {
-    const response = await api.post('https://backend-flower-shop.onrender.com/api/favorites', { product_id });
+    const response = await api.post('/', { product_id });
     toast.success('Added to favorites');
     return response.data;
   } catch (error) {
@@ -98,7 +98,7 @@ export const addFavorite = async (product_id) => {
 // ✅ Remove a product from favorites
 export const removeFavorite = async (product_id) => {
   try {
-    const response = await api.delete(`https://backend-flower-shop.onrender.com/api/favorites/${product_id}`);
+    const response = await api.delete(`/${product_id}`);
     toast.success('Removed from favorites');
     return response.data;
   } catch (error) {

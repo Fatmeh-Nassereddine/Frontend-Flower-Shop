@@ -1,12 +1,12 @@
 import axios from 'axios';
 
-const API_URL = 'https://backend-flower-shop.onrender.com/api/address'; // Replace this with your backend URL
+// const API_URL = 'https://backend-flower-shop.onrender.com/api/address'; // Replace this with your backend URL
 axios.defaults.withCredentials = true;
 
 // Helper function to get the authenticated user's addresses
 export const getUserAddresses = async () => {
   try {
-    const response = await axios.get(`${API_URL}`, { 
+    const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/address`, { 
       withCredentials: true  // Ensure cookies are sent for authentication
     });
     return response.data; // Return the addresses from the response
@@ -20,7 +20,7 @@ export const getUserAddresses = async () => {
 export const createAddress = async (addressData) => {
   try {
     console.log('Sending data to backend:', addressData);  // Log the address data
-    const response = await axios.post(`${API_URL}`, addressData, {
+    const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/address`, addressData, {
       withCredentials: true  // Send cookies to ensure authentication
     });
     console.log('Backend response:', response.data);  // Log the response from backend
@@ -34,7 +34,7 @@ export const createAddress = async (addressData) => {
 // Helper function to get an address by ID
 export const getAddressById = async (addressId) => {
   try {
-    const response = await axios.get(`${API_URL}/${addressId}`, {
+    const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/address/${addressId}`, {
       withCredentials: true
     });
     return response.data; // Return the specific address
@@ -47,7 +47,7 @@ export const getAddressById = async (addressId) => {
 // Helper function to update an address by ID
 export const updateAddress = async (addressId, addressData) => {
   try {
-    const response = await axios.put(`${API_URL}/${addressId}`, addressData, {
+    const response = await axios.put(`${process.env.REACT_APP_API_URL}/api/address/${addressId}`, addressData, {
       withCredentials: true
     });
     return response.data; // Return the success message or updated address
@@ -60,7 +60,7 @@ export const updateAddress = async (addressId, addressData) => {
 // Helper function to delete an address by ID
 export const deleteAddress = async (addressId) => {
   try {
-    const response = await axios.delete(`${API_URL}/${addressId}`, {
+    const response = await axios.delete(`${process.env.REACT_APP_API_URL}/api/address/${addressId}`, {
       withCredentials: true
     });
     return response.data; // Return the success message upon successful deletion

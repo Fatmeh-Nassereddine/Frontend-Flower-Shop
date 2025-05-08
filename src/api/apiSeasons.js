@@ -151,7 +151,7 @@ const apiSeasons = {
   // 🔹 For customers (authenticated)
   getAll: async () => {
     try {
-      const res = await apiClient.get('https://backend-flower-shop.onrender.com/api/seasons', { skipAuth: true });
+      const res = await apiClient.get('/', { skipAuth: true });
       console.log("Seasons Data:", res.data);  // Log response data
       return res.data; // Return the list of all seasons
     } catch (error) {
@@ -162,7 +162,7 @@ const apiSeasons = {
 
   getById: async (id) => {
     try {
-      const res = await apiClient.get(`https://backend-flower-shop.onrender.com/api/seasons/${id}`); // Fetch season by ID
+      const res = await apiClient.get(`/${id}`); // Fetch season by ID
       return res.data;
     } catch (error) {
       console.error(`Error fetching season with ID ${id}:`, error);
@@ -175,7 +175,7 @@ const apiSeasons = {
     // Admin: Create a new season
     create: async (seasonData) => {
       try {
-        const res = await apiClient.post('https://backend-flower-shop.onrender.com/api/seasons', seasonData); // Create a new season
+        const res = await apiClient.post('/', seasonData); // Create a new season
         return res.data;
       } catch (error) {
         console.error('Error creating season:', error);
@@ -186,7 +186,7 @@ const apiSeasons = {
     // Admin: Update a season by ID
     update: async (id, seasonData) => {
       try {
-        const res = await apiClient.put(`https://backend-flower-shop.onrender.com/api/seasons/${id}`, seasonData); // Update season by ID
+        const res = await apiClient.put(`/${id}`, seasonData); // Update season by ID
         return res.data;
       } catch (error) {
         console.error(`Error updating season with ID ${id}:`, error);
@@ -197,7 +197,7 @@ const apiSeasons = {
     // Admin: Delete a season by ID
     delete: async (id) => {
       try {
-        const res = await apiClient.delete(`https://backend-flower-shop.onrender.com/api/seasons/${id}`); // Delete season by ID
+        const res = await apiClient.delete(`/${id}`); // Delete season by ID
         return res.data;
       } catch (error) {
         console.error(`Error deleting season with ID ${id}:`, error);

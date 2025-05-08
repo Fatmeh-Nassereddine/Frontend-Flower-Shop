@@ -21,7 +21,7 @@ apiClient.interceptors.response.use(
 // 🔹 Get all categories
 export const getAllCategories = async () => {
   try {
-    const response = await apiClient.get("https://backend-flower-shop.onrender.com/api/categories");
+    const response = await apiClient.get('/');
     return response.data;
   } catch (error) {
     console.error("Error fetching categories:", error);
@@ -32,7 +32,7 @@ export const getAllCategories = async () => {
 // 🔹 Get category by ID
 export const getCategoryById = async (categoryId) => {
   try {
-    const response = await apiClient.get(`https://backend-flower-shop.onrender.com/api/categories/${categoryId}`);
+    const response = await apiClient.get(`/${categoryId}`);
     return response.data;
   } catch (error) {
     console.error(`Error fetching category with ID ${categoryId}:`, error);
@@ -57,7 +57,7 @@ export const createCategory = async (categoryData, imageFile) => {
   }
 
   try {
-    const response = await apiClient.post("https://backend-flower-shop.onrender.com/api/categories", formData, {
+    const response = await apiClient.post('/', formData, {
       headers: { "Content-Type": "multipart/form-data" },
     });
     return response.data;
@@ -84,7 +84,7 @@ export const updateCategory = async (categoryId, categoryData, imageFile) => {
   }
 
   try {
-    const response = await apiClient.put(`https://backend-flower-shop.onrender.com/api/categories/${categoryId}`, formData, {
+    const response = await apiClient.put(`/${categoryId}`, formData, {
       headers: { "Content-Type": "multipart/form-data" },
     });
     return response.data;
@@ -97,7 +97,7 @@ export const updateCategory = async (categoryId, categoryData, imageFile) => {
 // 🔹 Delete category by ID (Admin only)
 export const deleteCategory = async (categoryId) => {
   try {
-    const response = await apiClient.delete(`https://backend-flower-shop.onrender.com/api/categories/${categoryId}`);
+    const response = await apiClient.delete(`/${categoryId}`);
     return response.data;
   } catch (error) {
     console.error(`Error deleting category with ID ${categoryId}:`, error);

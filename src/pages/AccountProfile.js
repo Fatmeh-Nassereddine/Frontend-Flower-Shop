@@ -12,7 +12,8 @@ import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { getFavorites } from '../api/apiFavorite'; 
-import { getOrderItemsByUser } from '../api/apiOrders';
+import { getUserOrders,getOrderItemsByUser } from '../api/apiOrders';
+
 
 const AccountProfile = () => {
   const [activeTab, setActiveTab] = useState('profile');
@@ -24,6 +25,7 @@ const AccountProfile = () => {
   });
   const [favorites, setFavorites] = useState([]);
   const [orders, setOrders] = useState([]);
+  const [orderItems, setOrderItems] = useState([]);
 
   const getUser = async () => {
     try {
@@ -58,8 +60,16 @@ const AccountProfile = () => {
         const favoritesData = await getFavorites();
         setFavorites(favoritesData);
 
-        const ordersData = await getOrderItemsByUser(); // Optional: You can use ordersData if needed
-        setOrders(ordersData);
+        const ordersResult = await getUserOrders();
+        if (!ordersResult.error) {
+          setOrders(ordersResult.data);
+        }
+
+        const orderItemsResult = await getOrderItemsByUser();
+        if (!orderItemsResult.error) {
+          setOrderItems(orderItemsResult.data);
+        }
+
       } catch (err) {
         console.error('Failed to fetch data:', err);
       }
@@ -166,25 +176,79 @@ const AccountProfile = () => {
             </div>
           </div>
         );
-      case 'orders':
-        return (
-          <div className="bg-white shadow rounded-lg p-6 text-sm text-gray-800">
-            <h2 className="text-lg font-medium mb-2 text-[#593825]">My Orders</h2>
-            {orders.length > 0 ? (
-              <ul>
-                {orders.map((order, index) => (
-                  <li key={index} className="mb-2">
-                    <div>Order ID: {order.orderId}</div>
-                    <div>Item: {order.productName}</div>
-                    <div>Quantity: {order.quantity}</div>
-                  </li>
+        case 'orders':
+  return (
+    <div className="bg-white shadow rounded-lg p-6 text-sm text-gray-800">
+      <h2 className="text-lg font-medium mb-4 text-[#593825]">My Orders</h2>
+
+      {orders.length > 0 ? (
+        <div className="mb-6">
+          <h3 className="text-md font-semibold text-[#593825] mb-2">Order List</h3>
+          <div className="overflow-x-auto">
+            <table className="min-w-full text-left border">
+              <thead className="bg-gray-100">
+                <tr>
+                  <th className="border px-4 py-2">Order ID</th>
+                  <th className="border px-4 py-2">Total Amount</th>
+                  <th className="border px-4 py-2">Status</th>
+                  <th className="border px-4 py-2">Payment Method</th>
+                  <th className="border px-4 py-2">Placed On</th>
+                </tr>
+              </thead>
+              <tbody>
+                {orders.map((order) => (
+                  <tr key={order.order_id}>
+                    <td className="border px-4 py-2">{order.order_id}</td>
+                    <td className="border px-4 py-2">{order.total_amount}</td>
+                    <td className="border px-4 py-2 capitalize">{order.status}</td>
+                    <td className="border px-4 py-2">{order.payment_method}</td>
+                    <td className="border px-4 py-2">{order.order_date}
+                    {new Date(order.order_date || order.created_at).toLocaleDateString()}
+                    </td>
+                  </tr>
                 ))}
-              </ul>
-            ) : (
-              <p>You have no orders yet.</p>
-            )}
+              </tbody>
+            </table>
           </div>
-        );
+        </div>
+      ) : (
+        <p>No orders found.</p>
+      )}
+
+      {/* Order Items Table (unchanged) */}
+      {orderItems.length > 0 ? (
+        <div>
+          <h3 className="text-md font-semibold text-[#593825] mb-2">Order Items</h3>
+          <div className="overflow-x-auto">
+            <table className="min-w-full text-left border">
+              <thead className="bg-gray-100">
+                <tr>
+                  <th className="border px-4 py-2">Product Name</th>
+                  <th className="border px-4 py-2">Quantity</th>
+                  <th className="border px-4 py-2">Price</th>
+                  
+                </tr>
+              </thead>
+              <tbody>
+                {orderItems.map((item, index) => (
+                  <tr key={index}>
+                    <td className="border px-4 py-2">{item.productName}</td>
+                    <td className="border px-4 py-2">{item.quantity}</td>
+                    <td className="border px-4 py-2">{item.price}</td>
+                    
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      ) : (
+        <p>No order items found.</p>
+      )}
+    </div>
+  );
+
+        
         case 'favorites':
             return (
               <div className="bg-white shadow rounded-lg p-6 text-sm text-gray-800">

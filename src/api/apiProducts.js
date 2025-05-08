@@ -229,7 +229,7 @@ export const getAllProducts = async (
       params.seasons = seasons.join(',');
     }
 
-    const response = await apiClient.get('https://backend-flower-shop.onrender.com/api/products', { params });
+    const response = await apiClient.get('/', { params });
     return response.data;
   } catch (error) {
     console.error('Failed to fetch products:', error);
@@ -240,7 +240,7 @@ export const getAllProducts = async (
 // 🔹 Get product by ID
 export const getProductById = async (productId) => {
   try {
-    const response = await apiClient.get(`https://backend-flower-shop.onrender.com/api/products/${productId}`);
+    const response = await apiClient.get(`/${productId}`);
     return response.data;
   } catch (error) {
     console.error(`Error fetching product with ID ${productId}:`, error);
@@ -261,7 +261,7 @@ export const addProduct = async (productData, imageFiles) => {
       imageFiles.forEach((file) => formData.append('images', file));
     }
 
-    const response = await apiClient.post('https://backend-flower-shop.onrender.com/api/products/create', formData, {
+    const response = await apiClient.post('/create', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
 
@@ -285,7 +285,7 @@ export const updateProduct = async (id, productData, imageFiles) => {
       imageFiles.forEach((file) => formData.append('images', file));
     }
 
-    const response = await apiClient.put(`https://backend-flower-shop.onrender.com/api/products/${id}`, formData, {
+    const response = await apiClient.put(`/${id}`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
 
@@ -299,7 +299,7 @@ export const updateProduct = async (id, productData, imageFiles) => {
 // 🔹 Delete product
 export const deleteProduct = async (id) => {
   try {
-    const response = await apiClient.delete(`https://backend-flower-shop.onrender.com/api/products/${id}`);
+    const response = await apiClient.delete(`/${id}`);
     return response.data;
   } catch (error) {
     console.error(`Error deleting product with ID ${id}:`, error);
@@ -310,7 +310,7 @@ export const deleteProduct = async (id) => {
 // 🔹 Get products by season
 export const getProductsBySeason = async (seasonId) => {
   try {
-    const response = await apiClient.get(`https://backend-flower-shop.onrender.com/api/products/season/${seasonId}`);
+    const response = await apiClient.get(`/season/${seasonId}`);
     return response.data;
   } catch (error) {
     console.error(`Error fetching products for season ID ${seasonId}:`, error);
