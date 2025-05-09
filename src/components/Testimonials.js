@@ -197,9 +197,10 @@ export default function Testimonials() {
   const carouselSettings = {
     dots: true,
     infinite: true,
-    speed: 500,
-    slidesToShow: 1,
+    speed: 600,
+    slidesToShow: 3,
     slidesToScroll: 1,
+    autoplaySpeed: 2500,
     responsive: [
       {
         breakpoint: 1024, // For medium screens (tablets)
@@ -243,15 +244,21 @@ export default function Testimonials() {
       ) : error ? (
         <p className="text-red-500">Error: {error}</p>
       ) : (
+        <div className="w-full flex justify-center items-center">
+        <div className="max-w-6xl w-full px-4">
         <Slider {...carouselSettings}>
-          {testimonials.map((t, idx) => (
-            <div key={idx} className="bg-white shadow-md p-6 rounded-lg">
-              <p className="italic text-gray-700 mb-4">“{t.quote}”</p>
-              <h4 className="font-semibold text-pink-600">- {t.name}</h4>
-            </div>
-          ))}
-        </Slider>
-      )}
+      {testimonials.map((t, idx) => (
+        <div key={idx} className="px-2">
+          <div className="bg-white shadow-md p-4 rounded-lg text-center w-80 mx-auto">
+            <p className="italic text-gray-700 mb-3">“{t.quote}”</p>
+            <h4 className="font-semibold text-pink-600">- {t.name}</h4>
+          </div>
+        </div>
+      ))}
+    </Slider>
+  </div>
+</div>
+)}
     </section>
   );
 }

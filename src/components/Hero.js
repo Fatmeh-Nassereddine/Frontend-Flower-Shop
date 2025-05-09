@@ -1,16 +1,15 @@
 
-
 import React from 'react';
-import Home from '../assets/Home.svg'; // Ensure this path is correct
+import { useNavigate } from 'react-router-dom'; // import navigation hook
+import Home from '../assets/Home.svg';
 import '../styles/Hero.css';
-import PrimaryButton from '../components/PrimaryButton'; // Make sure it's default export
-
+import PrimaryButton from '../components/PrimaryButton';
 
 function Hero() {
+  const navigate = useNavigate(); // initialize navigation
+
   return (
-    
     <section
-    
       className="relative bg-cover bg-center h-[85vh] flex flex-col items-end justify-center text-white"
       style={{ backgroundImage: `url(${Home})` }}
     >
@@ -31,26 +30,25 @@ function Hero() {
 
       {/* Browse Categories Button */}
       <button
-      className="font-hina font-semibold text-white rounded-full px-4 py-2 transition duration-300 absolute flex items-center justify-center"
-     style={{
-    backgroundColor: '#9E9A9C',
-    top: '410px',
-    left: '760px',
-    width: '240px',
-    height: '40px',
-    whiteSpace: 'nowrap', // prevent word wrap
-    letterSpacing: '1px', // optional spacing for better look
-  }}
-
- onMouseOver={(e) => {
-    e.target.style.backgroundColor = '#7a7678'; // darker shade on hover
-  }}
-  onMouseOut={(e) => {
-    e.target.style.backgroundColor = '#9E9A9C'; // original color
-  }}
-  >
-  BROWSE CATEGORIES
-        
+        onClick={() => navigate('/categories')}
+        className="font-hina font-semibold text-white rounded-full px-4 py-2 transition duration-300 absolute flex items-center justify-center"
+        style={{
+          backgroundColor: '#9E9A9C',
+          top: '410px',
+          left: '760px',
+          width: '240px',
+          height: '40px',
+          whiteSpace: 'nowrap',
+          letterSpacing: '1px',
+        }}
+        onMouseOver={(e) => {
+          e.target.style.backgroundColor = '#7a7678';
+        }}
+        onMouseOut={(e) => {
+          e.target.style.backgroundColor = '#9E9A9C';
+        }}
+      >
+        BROWSE CATEGORIES
       </button>
 
       {/* Subheading */}
@@ -70,7 +68,7 @@ function Hero() {
 
       {/* Shop Now Button */}
       <div
-        className="absolute font-hina "
+        className="absolute font-hina"
         style={{
           top: '410px',
           left: '995px',
@@ -79,13 +77,13 @@ function Hero() {
           textAlign: 'center',
         }}
       >
-        <PrimaryButton text="SHOP NOW" />
+        <PrimaryButton text="SHOP NOW" onClick={() => navigate('/shop')} />
       </div>
     </section>
-   
   );
 }
 
 export default Hero;
+
 
 
