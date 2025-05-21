@@ -3,6 +3,7 @@ import { Heart, ShoppingCart } from "lucide-react";
 import { Link } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import { useShop } from "../components/context/ShopContext";
 
 // API functions
 import {
@@ -14,6 +15,8 @@ export default function FavoritesPage() {
   const [favorites, setFavorites] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState(null);
+  const { addToCart } = useShop();
+  const [addedToCartIds, setAddedToCartIds] = React.useState([]);
 
   React.useEffect(() => {
     const loadFavorites = async () => {
@@ -43,9 +46,15 @@ export default function FavoritesPage() {
     }
   };
 
-  const addToCart = (product_id) => {
-    console.log(`Added item ${product_id} to cart`);
+  const handleAddToCart = async (product_id) => {
+    try {
+      await addToCart(product_id, 1);
+      setAddedToCartIds([...addedToCartIds, product_id]); // Mark as added
+    } catch (error) {
+      console.error('Add to cart failed:', error);
+    }
   };
+  
 
   const buttonStyles = {
     base:
@@ -152,22 +161,31 @@ export default function FavoritesPage() {
                 </div>
 
                 <div className="flex flex-col sm:flex-row gap-2 mt-auto">
-                  <button
-                    onClick={() => addToCart(item.product_id)}
-                    className={`${buttonStyles.base} ${buttonStyles.solid}`}
-                    style={inlineSolidStyle}
-                    onMouseOver={(e) =>
-                      (e.target.style.backgroundColor =
-                        inlineHoverSolidStyle.backgroundColor)
-                    }
-                    onMouseOut={(e) =>
-                      (e.target.style.backgroundColor =
-                        inlineSolidStyle.backgroundColor)
-                    }
-                  >
-                    <ShoppingCart size={16} />
-                    Add to Cart
-                  </button>
+                {addedToCartIds.includes(item.product_id) ? (
+                    <button
+                      disabled
+                      className={`${buttonStyles.base} bg-pink-700 text-white cursor-not-allowed`}
+                    >
+                       Added to Cart
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => handleAddToCart(item.product_id)}
+                      className={`${buttonStyles.base} ${buttonStyles.solid}`}
+                      style={inlineSolidStyle}
+                      onMouseOver={(e) =>
+                        (e.target.style.backgroundColor =
+                          inlineHoverSolidStyle.backgroundColor)
+                      }
+                      onMouseOut={(e) =>
+                        (e.target.style.backgroundColor =
+                          inlineSolidStyle.backgroundColor)
+                      }
+                    >
+                      <ShoppingCart size={16} />
+                      Add to Cart
+                    </button>
+                  )}
 
                   <button
                     onClick={() => removeFromFavorites(item.product_id)}

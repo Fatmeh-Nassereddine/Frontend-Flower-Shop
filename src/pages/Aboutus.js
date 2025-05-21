@@ -16,7 +16,7 @@ export default function Aboutus() {
             {/* Left Column */}
              <div>
               <video
-                className=" float: right rounded-lg shadow-lg w-64"
+                className=" rounded-lg shadow-lg w-64"
                 autoPlay
                 muted
                 loop
@@ -62,9 +62,9 @@ export default function Aboutus() {
             </div>
 
             {/* Right Column */}
-            <div>
+            <div className="flex flex-col items-end" >
               <video
-                className="rounded-lg shadow-lg w-80"
+                className=" rounded-lg shadow-lg w-80"
                 autoPlay
                 muted
                 loop
@@ -73,7 +73,7 @@ export default function Aboutus() {
                 <source src={Aboutss2} type="video/mp4" />
                 Your browser does not support the video tag.
               </video>
-              <p className=" font-hina text-[#593825] mt-4  text-lg">Fresh floral design</p>
+              <p className="  font-hina text-[#593825] mt-4  text-lg">Fresh floral design</p>
             </div>
           </div>
         </div>
