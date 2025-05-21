@@ -2,7 +2,7 @@ import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { useAuth } from './hooks/AuthContext'; 
 import ProtectedRoute from './Route/ProtectedRoute';
-import Loader from './components/loader/Loader.js';
+import Loader from './components/loader/loader.js';
 import NotFound from './pages/NotFound';
 
 // Admin Pages

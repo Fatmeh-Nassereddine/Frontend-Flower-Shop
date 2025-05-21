@@ -16,7 +16,7 @@ export default function Aboutus() {
             {/* Left Column */}
              <div>
               <video
-                className="rounded-lg shadow-lg w-64"
+                className=" float: right rounded-lg shadow-lg w-64"
                 autoPlay
                 muted
                 loop
