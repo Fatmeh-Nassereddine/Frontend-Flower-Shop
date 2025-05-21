@@ -96,13 +96,13 @@
 import React, { useState } from 'react';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
-import PaymentIcon from '@mui/icons-material/Payment';
+
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { toast } from 'react-toastify';
 import Step1 from '../components/checkout/CheckoutStep1_CartReview';
 import Step2 from '../components/checkout/CheckoutStep2_Shipping';
 import Step3 from '../components/checkout/CheckoutStep3_Confirm';
-// import Step4 from '../components/checkout/CheckoutStep4_Success';
+
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 
