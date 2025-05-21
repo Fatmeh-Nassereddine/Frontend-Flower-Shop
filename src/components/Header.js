@@ -1,18 +1,25 @@
 
 
 
-
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FiPhone, FiMapPin, FiShoppingCart, FiUser, FiMenu, FiX, FiHeart } from 'react-icons/fi';
+import {
+  FiPhone,
+  FiMapPin,
+  FiShoppingCart,
+  FiUser,
+  FiMenu,
+  FiX,
+  FiHeart,
+} from 'react-icons/fi';
 import logo from '../assets/logo.svg';
 import { useShop } from '../components/context/ShopContext';
-import { useAuth } from '../hooks/AuthContext'; // ✅ Correct import
+import { useAuth } from '../hooks/AuthContext';
 
 function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const { cartItems, likedItems } = useShop();
-  const { user, logoutUser } = useAuth(); // ✅ Correct usage
+  const { user, logoutUser } = useAuth();
   const navigate = useNavigate();
 
   const logout = () => {
@@ -26,14 +33,13 @@ function Header() {
 
   return (
     <header className="bg-[#9EA0A2] shadow-md px-4 md:px-10 py-4">
-      <div className="flex justify-between items-center">
-        {/* Logo */}
-        <div className="flex items-center space-x-2">
-          <img src={logo} alt="Logo" className="w-26 h-26" />
+      <div className="flex items-center justify-between">
+        <Link to="/" className="flex items-center space-x-2">
+          <img src={logo} alt="Logo" className="w-26 h-26 cursor-pointer" />
           <span className="text-sm md:text-base font-light uppercase text-white font-hina">
             Tima's Elegant Essence
           </span>
-        </div>
+        </Link>
 
         {/* Desktop Nav */}
         <nav className="hidden md:flex space-x-6 text-sm text-white font-hina">
@@ -68,15 +74,15 @@ function Header() {
           <div className="flex items-center space-x-3">
             {user ? (
               <>
-              <p
-                onClick={() => navigate('/account')}
-                onKeyDown={(e) => e.keyCode === 13 && navigate('/account')}
-                tabIndex="0"
-                role="button"
-                className="text-white cursor-pointer hover:text-[#B03074] focus:outline-none"
-              >
-                {user.name}
-              </p>
+                <p
+                  onClick={() => navigate('/account')}
+                  onKeyDown={(e) => e.keyCode === 13 && navigate('/account')}
+                  tabIndex="0"
+                  role="button"
+                  className="text-white cursor-pointer hover:text-[#B03074] focus:outline-none"
+                >
+                  {user.name}
+                </p>
                 <p
                   onClick={logout}
                   onKeyDown={(e) => e.keyCode === 13 && logout()}
