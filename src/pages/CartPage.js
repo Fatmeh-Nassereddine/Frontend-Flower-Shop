@@ -42,15 +42,32 @@ const CartPage = () => {
         setCartItems(cartData.items || []);
       } catch (error) {
         console.error("Error fetching user or cart:", error);
+        const status = error?.response?.status;
+
+      if (status === 401 || status === 403) {
         toast.error("Please log in to access your cart.");
         navigate("/login");
-      } finally {
-        setLoading(false);
+      } else {
+        toast.error("Failed to fetch your cart. Please try again.");
+        // Optionally stay on the page and allow retry
       }
-    };
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchUserAndCart();
+}, [setCartItems, navigate]);
+
+  //       toast.error("Please log in to access your cart.");
+  //       navigate("/login");
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
   
-    fetchUserAndCart();
-  }, [setCartItems, navigate]);
+  //   fetchUserAndCart();
+  // }, [setCartItems, navigate]);
   
 
   const throttledUpdateQuantity = throttle(
@@ -123,7 +140,7 @@ const CartPage = () => {
             <p className="mb-6 text-gray-600">
               Add some products to your cart and they will appear here
             </p>
-            <Link to="/">
+            <Link to="/shop">
               <button
                 className="font-hina font-semibold px-6 py-2 rounded-full transition duration-300"
                 style={{
@@ -270,7 +287,7 @@ const CartPage = () => {
                   </button>
                 </Link>
 
-                <Link to="/" className="block">
+                <Link to="/shop" className="block">
                   <button
                     className="w-full font-hina font-semibold px-6 py-2 rounded-full transition duration-300"
                     style={{

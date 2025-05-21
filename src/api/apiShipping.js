@@ -1,51 +1,165 @@
 import axios from "axios";
+import Cookies from "js-cookie";
 
 // ✅ Global Axios Config
-axios.defaults.baseURL = "https://backend-flower-shop.onrender.com/api"; // Use the full backend URL directly
 axios.defaults.withCredentials = true;
+axios.defaults.headers.common['Authorization'] = `Bearer ${Cookies.get('token')}`;
 
 // ===========================
 // 📦 SHIPPING OPTIONS
 // ===========================
 
-// GET /shippings/shipping-options — for customers at checkout
+// In apiShipping.js
 export const fetchShippingOptions = async () => {
-  const res = await axios.get("https://backend-flower-shop.onrender.com/api/shippings/shipping-options", {
-    withCredentials: true,
-  });
-  return res.data;
+  try {
+    const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/shippings/shipping-options`);
+    // Ensure response data is an array
+    return { 
+      success: true, 
+      data: Array.isArray(res.data) ? res.data : [] 
+    };
+  } catch (error) {
+    console.error('Shipping options error:', error);
+    return { 
+      success: false, 
+      error: error.message,
+      data: [] // Return empty array on error
+    };
+  }
 };
 
 // ===========================
-// 📋 ADMIN SHIPPING MANAGEMENT
+// 📋 SHIPPING RECORDS
 // ===========================
 
-// GET /shippings — get all shipping records (admin only)
+export const createShipping = async ({ delivery_fee, order_id,address_id  }) => {
+  try {
+    const res = await axios.post(`${process.env.REACT_APP_API_URL}/api/shippings`, {
+      order_id,
+      delivery_fee: Number(delivery_fee),
+      address_id
+    }, {
+      headers: {
+        'Authorization': `Bearer ${Cookies.get('token')}` // If using CSRF protection
+      }
+    });
+    
+    return { 
+      success: true, 
+      shippingId: res.data.id,
+      data: res.data 
+    };
+    
+  } catch (error) {
+    console.error('Create shipping error:', {
+      error: error.response?.data || error.message,
+      payload: { delivery_fee, order_id ,address_id }
+    });
+    
+    // Handle specific error cases
+    let errorMessage = 'Failed to create shipping record';
+    if (error.response?.status === 401) {
+      errorMessage = 'Authentication required';
+    } else if (error.response?.status === 404) {
+      errorMessage = 'Order not found';
+    }
+    
+    return { 
+      success: false, 
+      error: error.response?.data?.message || errorMessage 
+    };
+  }
+};
+
+// Enhanced version with retry logic
+export const createShippingWithRetry = async (payload, retries = 2) => {
+  try {
+    return await createShipping(payload);
+  } catch (error) {
+    if (retries > 0) {
+      console.log(`Retrying shipping creation... (${retries} left)`);
+      return createShippingWithRetry(payload, retries - 1);
+    }
+    throw error;
+  }
+};
+
+// ===========================
+// 🔐 ADMIN SHIPPING MANAGEMENT
+// ===========================
+
 export const getAllShippings = async () => {
-  const res = await axios.get("https://backend-flower-shop.onrender.com/api/shippings");
-  return res.data;
+  try {
+    const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/shippings`);
+    return { success: true, data: res.data };
+  } catch (error) {
+    console.error('Get all shippings error:', error.response?.data || error.message);
+    return { 
+      success: false, 
+      error: 'Failed to fetch shipping records' 
+    };
+  }
 };
 
-// GET /shippings/:id — get one shipping record
 export const getShippingById = async (id) => {
-  const res = await axios.get(`https://backend-flower-shop.onrender.com/api/shippings/${id}`);
-  return res.data;
+  try {
+    const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/shippings/${id}`);
+    return { success: true, data: res.data };
+  } catch (error) {
+    console.error('Get shipping error:', {
+      id,
+      error: error.response?.data || error.message
+    });
+    return { 
+      success: false, 
+      error: `Shipping record ${id} not found` 
+    };
+  }
 };
 
-// POST /shippings — create a new shipping record (after order placed)
-export const createShipping = async ({ delivery_fee, order_id }) => {
-  const res = await axios.post("https://backend-flower-shop.onrender.com/api/shippings", { delivery_fee, order_id });
-  return res.data;
-};
-
-// PUT /shippings/:id — update an existing shipping record (admin only)
 export const updateShipping = async (id, updates) => {
-  const res = await axios.put(`https://backend-flower-shop.onrender.com/api/shippings/${id}`, updates);
-  return res.data;
+  try {
+    const res = await axios.put(
+      `${process.env.REACT_APP_API_URL}/api/shippings/${id}`,
+      updates
+    );
+    return { success: true, data: res.data };
+  } catch (error) {
+    console.error('Update shipping error:', {
+      id,
+      updates,
+      error: error.response?.data || error.message
+    });
+    return { 
+      success: false, 
+      error: 'Failed to update shipping record' 
+    };
+  }
 };
 
-// DELETE /shippings/:id — delete a shipping record (admin only)
 export const deleteShipping = async (id) => {
-  const res = await axios.delete(`https://backend-flower-shop.onrender.com/api/shippings/${id}`);
-  return res.data;
+  try {
+    await axios.delete(`${process.env.REACT_APP_API_URL}/api/shippings/${id}`);
+    return { success: true };
+  } catch (error) {
+    console.error('Delete shipping error:', {
+      id,
+      error: error.response?.data || error.message
+    });
+    return { 
+      success: false, 
+      error: 'Failed to delete shipping record' 
+    };
+  }
+};
+
+// Utility function
+export const validateShippingData = (data) => {
+  if (!data.order_id || !data.delivery_fee) {
+    return { isValid: false, error: 'Missing required fields' };
+  }
+  if (isNaN(parseFloat(data.delivery_fee))) {
+    return { isValid: false, error: 'Delivery fee must be a number' };
+  }
+  return { isValid: true };
 };

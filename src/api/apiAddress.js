@@ -1,69 +1,98 @@
 import axios from 'axios';
+import Cookies from 'js-cookie';
 
-// const API_URL = 'https://backend-flower-shop.onrender.com/api/address'; // Replace this with your backend URL
-axios.defaults.withCredentials = true;
+const BASE_URL = process.env.REACT_APP_API_URL;
 
-// Helper function to get the authenticated user's addresses
-export const getUserAddresses = async () => {
-  try {
-    const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/address`, { 
-      withCredentials: true  // Ensure cookies are sent for authentication
-    });
-    return response.data; // Return the addresses from the response
-  } catch (error) {
-    console.error('Error fetching user addresses:', error);
-    throw error; // Rethrow the error to handle it in the calling component
-  }
+// Helper to include Authorization header
+export const authHeaders = () => {
+  const token = Cookies.get('token'); // assuming token is stored in cookies
+  return {
+    headers: {
+      Authorization: token ? `Bearer ${token}` : '',
+    },
+  };
 };
 
-// Helper function to create a new address
-export const createAddress = async (addressData) => {
+// Fetch all addresses for the authenticated user
+export const getUserAddresses = async () => {
   try {
-    console.log('Sending data to backend:', addressData);  // Log the address data
-    const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/address`, addressData, {
-      withCredentials: true  // Send cookies to ensure authentication
-    });
-    console.log('Backend response:', response.data);  // Log the response from backend
-    return response.data; // Return the success message or created address
+    const response = await axios.get(`${BASE_URL}/api/address`, authHeaders());
+    return response.data.addresses || [];
   } catch (error) {
-    console.error('Error creating address:', error);
+    console.error('Error fetching user addresses:', error);
     throw error;
   }
 };
 
-// Helper function to get an address by ID
+// Create a new address for the authenticated user
+export const createAddress = async (addressData) => {
+  try {
+    const response = await axios.post(
+      `${BASE_URL}/api/address`,
+      addressData,
+      authHeaders()
+    );
+
+    if (response.data.error) {
+      throw new Error(response.data.error);
+    }
+
+    return response.data;
+  } catch (error) {
+    console.error('Address creation error:', {
+      error: error.response?.data || error.message,
+      requestData: addressData,
+    });
+
+    let message = 'Failed to create address';
+    if (error.response?.data?.error) {
+      message = error.response.data.error;
+      if (error.response.data.details) {
+        message += `: ${JSON.stringify(error.response.data.details)}`;
+      }
+    }
+
+    throw new Error(message);
+  }
+};
+
+// Get a specific address by ID
 export const getAddressById = async (addressId) => {
   try {
-    const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/address/${addressId}`, {
-      withCredentials: true
-    });
-    return response.data; // Return the specific address
+    const response = await axios.get(
+      `${BASE_URL}/api/address/${addressId}`,
+      authHeaders()
+    );
+    return response.data.address;
   } catch (error) {
     console.error('Error fetching address by ID:', error);
     throw error;
   }
 };
 
-// Helper function to update an address by ID
+// Update an address by ID
 export const updateAddress = async (addressId, addressData) => {
   try {
-    const response = await axios.put(`${process.env.REACT_APP_API_URL}/api/address/${addressId}`, addressData, {
-      withCredentials: true
-    });
-    return response.data; // Return the success message or updated address
+    const response = await axios.put(
+      `${BASE_URL}/api/address/${addressId}`,
+      addressData,
+      authHeaders()
+    );
+    return response.data;
   } catch (error) {
     console.error('Error updating address:', error);
     throw error;
   }
 };
 
-// Helper function to delete an address by ID
+// Delete an address by ID
 export const deleteAddress = async (addressId) => {
   try {
-    const response = await axios.delete(`${process.env.REACT_APP_API_URL}/api/address/${addressId}`, {
-      withCredentials: true
-    });
-    return response.data; // Return the success message upon successful deletion
+    const response = await axios.delete(
+      `${BASE_URL}/api/address/${addressId}`,
+      authHeaders()
+    );
+    return response.data;
   } catch (error) {
     console.error('Error deleting address:', error);
     throw error;

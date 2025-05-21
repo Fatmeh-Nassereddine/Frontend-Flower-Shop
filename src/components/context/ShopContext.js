@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { toast } from "sonner";
+import axios from "axios";
+import Cookies from "js-cookie"; // for token
 
 import {
   addProductToCart,
@@ -27,6 +29,10 @@ export const ShopContext = createContext({
   updateCartItemQuantity: () => {},
   refreshShopData: () => {},
   loading: false,
+  discount: null,
+  setDiscount: () => {},
+  getCartSubtotal: () => 0,
+  getDiscountedTotal: () => 0,
 });
 
 export function ShopProvider({ children }) {
@@ -35,21 +41,32 @@ export function ShopProvider({ children }) {
   const [userId, setUserId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
+  const [discount, setDiscount] = useState(null);
+
+  
+
 
   // Load cart from localStorage on mount
   useEffect(() => {
-    const storedCart = localStorage.getItem("cartItems");
-    if (storedCart) {
-      setCartItems(JSON.parse(storedCart));
+    const cookieCart = Cookies.get("cartItems");
+    if (cookieCart) {
+      try {
+        setCartItems(JSON.parse(cookieCart));
+      } catch (e) {
+        console.error("Failed to parse cart cookie", e);
+        Cookies.remove("cartItems");
+      }
     }
   }, []);
+  
 
-  // Persist cart to localStorage on change
+
   useEffect(() => {
-    localStorage.setItem("cartItems", JSON.stringify(cartItems));
+    Cookies.set("cartItems", JSON.stringify(cartItems), { expires: 1 }); // expires in 1 day
   }, [cartItems]);
+  
 
-  // Fetch user and cart/favorites
+  // 🔁 Fetch user, cart, favorites, and discounts
   const fetchUserAndData = async () => {
     setLoading(true);
     try {
@@ -58,18 +75,23 @@ export function ShopProvider({ children }) {
         setUser(fetchedUser);
         setUserId(fetchedUser.id);
 
-        const [cartData, favoritesData] = await Promise.all([
+        const [cartData, favoritesData, discountsData] = await Promise.all([
           getUserCart(fetchedUser.id),
           getFavorites(),
+          fetchDiscounts(), // ✅ fetch discounts here
         ]);
 
         setCartItems(cartData?.items || []);
         setLikedItems(favoritesData.map((f) => f.product_id));
+        if (discountsData?.length > 0) {
+          setDiscount(discountsData[0]); // take first valid discount
+        }
       } else {
         setUser(null);
         setUserId(null);
         setCartItems([]);
         setLikedItems([]);
+        setDiscount(null);
       }
     } catch (error) {
       toast.error("Failed to load cart or favorites.");
@@ -134,15 +156,14 @@ export function ShopProvider({ children }) {
     }
   };
 
-  const clearCart = async () => {
-    try {
-      await clearUserCart(userId);
-      setCartItems([]);
-      toast.success("Cart cleared.");
-    } catch {
-      toast.error("Failed to clear cart.");
-    }
+
+
+  const clearCart = () => {
+    Cookies.remove("cartItems");
+    setCartItems([]);
+    toast.success("Cart cleared (frontend only).");
   };
+  
 
   const toggleLike = async (productId) => {
     if (!userId) {
@@ -167,6 +188,48 @@ export function ShopProvider({ children }) {
     }
   };
 
+  // 🧮 Get subtotal
+  const getCartSubtotal = () => {
+    return cartItems.reduce((total, item) => {
+      const price =
+        item?.product?.price ?? // preferred nested structure
+        item?.product_price ??  // fallback if flat
+        0;
+      return total + price * (item.quantity || 0);
+    }, 0);
+  };
+  
+
+  // 💰 Get discounted total
+  const getDiscountedTotal = () => {
+    const subtotal = getCartSubtotal();
+    if (!discount) return subtotal;
+
+    const amount = Number(discount.amount);
+    return discount.discount_type === "percentage"
+      ? subtotal - subtotal * (amount / 100)
+      : Math.max(0, subtotal - amount);
+  };
+
+  // 🔄 Fetch active discounts
+  const fetchDiscounts = async () => {
+    try {
+      const token = Cookies.get("token");
+      const res = await axios.get(
+        `${process.env.REACT_APP_API_URL}/api/discounts`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      return res.data || [];
+    } catch (error) {
+      console.error("Failed to fetch discount:", error);
+      return [];
+    }
+  };
+
   return (
     <ShopContext.Provider
       value={{
@@ -180,6 +243,10 @@ export function ShopProvider({ children }) {
         updateCartItemQuantity,
         refreshShopData,
         loading,
+        discount,               // ✅ provided
+        setDiscount,            // ✅ provided
+        getCartSubtotal,
+        getDiscountedTotal,     // ✅ provided
       }}
     >
       {children}
@@ -193,3 +260,28 @@ export const useShop = () => useContext(ShopContext);
 
 
 
+  // const clearCart = async () => {
+  //   try {
+  //     await clearUserCart(userId);
+  //     setCartItems([]);
+  //     toast.success("Cart cleared.");
+  //   } catch {
+  //     toast.error("Failed to clear cart.");
+  //   }
+  // };
+
+
+    // Persist cart to localStorage on change
+  // useEffect(() => {
+  //   localStorage.setItem("cartItems", JSON.stringify(cartItems));
+  // }, [cartItems]);
+
+
+
+  // Load cart from localStorage on mount
+  // useEffect(() => {
+  //   const storedCart = localStorage.getItem("cartItems");
+  //   if (storedCart) {
+  //     setCartItems(JSON.parse(storedCart));
+  //   }
+  // }, []);

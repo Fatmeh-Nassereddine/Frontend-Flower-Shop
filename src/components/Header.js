@@ -40,6 +40,7 @@ function Header() {
           <Link to="/" className="text-xl hover:text-[#B03074]">Home</Link>
           <Link to="/shop" className="text-xl hover:text-[#B03074]">Shop</Link>
           <Link to="/seasonal" className="text-xl hover:text-[#B03074]">Seasonal</Link>
+          <Link to="/promotions" className="text-xl hover:text-[#B03074]">Promotions</Link>
           <Link to="/about" className="text-xl hover:text-[#B03074]">About us</Link>
           <Link to="/contact" className="text-xl hover:text-[#B03074]">Contact us</Link>
         </nav>

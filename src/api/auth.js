@@ -76,59 +76,59 @@
 
 // src/api/auth.js
 
-import axios from "axios";
+// import axios from "axios";
 
-// ✅ Set base URL and enable cookies globally
-axios.defaults.baseURL = process.env.REACT_APP_API_URL || "https://backend-flower-shop.onrender.com";
-axios.defaults.withCredentials = true;
+// // ✅ Set base URL and enable cookies globally
+// axios.defaults.baseURL = process.env.REACT_APP_API_URL || "https://backend-flower-shop.onrender.com";
+// axios.defaults.withCredentials = true;
 
-// ===========================
-// 🔑 AUTHENTICATION SERVICES
-// ===========================
+// // ===========================
+// // 🔑 AUTHENTICATION SERVICES
+// // ===========================
 
-// Login
-export const login = async (email, password) => {
-  try {
-    const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/auth/login`, { email, password });
-    return response.data.user;
-  } catch (error) {
-    console.error("Error during login:", error);
-    throw new Error(error.response?.data?.error || "Login failed");
-  }
-};
+// // Login
+// export const login = async (email, password) => {
+//   try {
+//     const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/auth/login`, { email, password });
+//     return response.data.user;
+//   } catch (error) {
+//     console.error("Error during login:", error);
+//     throw new Error(error.response?.data?.error || "Login failed");
+//   }
+// };
 
-// Register
-export const register = async (name, email, password, address) => {
-  try {
-    const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/auth/register`, { name, email, password, address });
-    return response.data;
-  } catch (error) {
-    console.error("Error during registration:", error);
-    throw new Error(error.response?.data?.error || "Registration failed");
-  }
-};
+// // Register
+// export const register = async (name, email, password, address) => {
+//   try {
+//     const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/auth/register`, { name, email, password, address });
+//     return response.data;
+//   } catch (error) {
+//     console.error("Error during registration:", error);
+//     throw new Error(error.response?.data?.error || "Registration failed");
+//   }
+// };
 
-// Logout
-export const logout = async () => {
-  try {
-    const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/auth/logout`);
-    return response.data;
-  } catch (error) {
-    console.error("Error during logout:", error);
-    throw new Error(error.response?.data?.error || "Logout failed");
-  }
-};
+// // Logout
+// export const logout = async () => {
+//   try {
+//     const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/auth/logout`);
+//     return response.data;
+//   } catch (error) {
+//     console.error("Error during logout:", error);
+//     throw new Error(error.response?.data?.error || "Logout failed");
+//   }
+// };
 
-// Get the current logged-in user (based on session cookie)
-export const getUser = async () => {
-  try {
-    const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/auth/verify`);
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching user:", error);
-    throw new Error("Failed to authenticate the user");
-  }
-};
+// // Get the current logged-in user (based on session cookie)
+// export const getUser = async () => {
+//   try {
+//     const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/auth/verify`);
+//     return response.data;
+//   } catch (error) {
+//     console.error("Error fetching user:", error);
+//     throw new Error("Failed to authenticate the user");
+//   }
+// };
 
 
 
@@ -141,3 +141,85 @@ export const getUser = async () => {
 //     throw new Error(error.response?.data?.error || "Login failed");
 //   }
 // };
+
+
+
+
+
+
+
+import axios from "axios";
+import Cookies from "js-cookie";  // Import js-cookie
+
+// ✅ Set base URL and enable cookies globally
+axios.defaults.baseURL = process.env.REACT_APP_API_URL || "https://backend-flower-shop.onrender.com";
+
+// ===========================
+// 🔑 AUTHENTICATION SERVICES
+// ===========================
+
+// Login
+export const login = async (email, password) => {
+  try {
+    const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/auth/login`, { email, password });
+    // Store token in cookies (instead of setting it globally in axios)
+    Cookies.set("token", response.data.token, { expires: 1, path: '/' });  // Expires in 1 day
+    return response.data.user;
+  } catch (error) {
+    console.error("Error during login:", error);
+    throw new Error(error.response?.data?.error || "Login failed");
+  }
+};
+
+// Register
+export const register = async (name, email, password, address) => {
+  try {
+    const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/auth/register`, 
+      { name, email, password, address });
+  // Store the token from the response
+  const { token, user } = response.data;
+  Cookies.set("token", token, { expires: 1, path: '/' });  // Expires in 1 day
+
+  return user;
+} catch (error) {
+  console.error("Error during registration:", error);
+  const errorMessage = error.response?.data?.error || "Registration failed. Please try again.";
+  throw new Error(errorMessage);
+}
+};
+
+// Logout
+export const logout = async () => {
+  try {
+    const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/auth/logout`);
+    // Remove the token from cookies on logout
+    Cookies.remove("token");
+    return response.data;
+  } catch (error) {
+    console.error("Error during logout:", error);
+    throw new Error(error.response?.data?.error || "Logout failed");
+  }
+};
+
+// Get the current logged-in user (based on session cookie)
+export const getUser = async () => {
+  const token = Cookies.get("token");
+
+  if (!token) {
+    throw new Error("No auth token found");
+  }
+
+  try {
+    const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/auth/verify`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    return response.data; // this should include user `id`, `name`, etc.
+
+  } catch (error) {
+    console.error("Error fetching user:", error?.response?.data || error.message);
+    throw new Error("Failed to authenticate the user");
+  }
+};

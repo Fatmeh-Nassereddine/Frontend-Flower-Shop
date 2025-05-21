@@ -98,7 +98,7 @@ export default function FavoritesPage() {
           <p className="mb-6 text-gray-600 font-hina text-sm sm:text-base">
             Add items to your favorites while shopping and they will appear here.
           </p>
-          <Link to="/">
+          <Link to="/shop">
             <button
               className="font-hina font-semibold px-6 py-2 rounded-full transition duration-300 text-white text-sm sm:text-base"
               style={inlineSolidStyle}

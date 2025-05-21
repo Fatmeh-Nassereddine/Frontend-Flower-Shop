@@ -2,15 +2,13 @@ import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { useAuth } from './hooks/AuthContext'; 
 import ProtectedRoute from './Route/ProtectedRoute';
-import Loader from './components/Loader/Loader';
+import Loader from './components/loader/Loader';
 import NotFound from './pages/NotFound';
 
 // Admin Pages
 import Dashboard from './pages/Admin/Dashboard';
 import DashboardHome from './pages/Admin/DashboardHome';
 import ProductList from './pages/Admin/Products/ProductList';
-// import AddProduct from './pages/Admin/Products/AddProduct';
-// import EditProduct from './pages/Admin/Products/EditProduct';
 import OrderList from './pages/Admin/Orders/OrderList';
 import CategoryList from './pages/Admin/Categories/CategoryList';
 import UserList from './pages/Admin/Users/UserList';
@@ -18,6 +16,9 @@ import ReviewList from './pages/Admin/Reviews/ReviewList';
 import DiscountList from './pages/Admin/Discounts/DiscountList';
 import MessageList from './pages/Admin/Messages/MessageList';
 import AdminSettings from './pages/Admin/Settings/AdminSettings';
+import SeasonalList from './pages/Admin/Seasonal/SeasonalList';
+import SubscriptionList from './pages/Admin/Subscriptions/SubscriptionList';
+
 
 // Public Pages
 import Home from './pages/Home';
@@ -34,6 +35,7 @@ import ProductsByCategoryPage from './pages/ProductsByCategoryPage';
 import CheckoutPage from './pages/Checkout';
 import ThankYouPage from './pages/ThankYouPage';
 import AccountProfile from './pages/AccountProfile';
+import Promotions from './components/Promotions';
 
 function AppRoutes({ darkMode, toggleSidebar, toggleDarkMode, sidebarCollapsed, activeTab, setActiveTab }) {
   const { loading } = useAuth();
@@ -44,7 +46,8 @@ function AppRoutes({ darkMode, toggleSidebar, toggleDarkMode, sidebarCollapsed, 
 
   return (
     <Routes>
-      {/* Public Routes */}
+        {/* Wrap all public pages in PublicLayout */}
+       {/* <Route element={<PublicLayout />}> */}
       <Route path="/" element={<Home />} />
       <Route path="/shop" element={<Shop />} />
       <Route path="/about" element={<Aboutus />} />
@@ -57,39 +60,41 @@ function AppRoutes({ darkMode, toggleSidebar, toggleDarkMode, sidebarCollapsed, 
       <Route path="/login" element={<LoginUp />} />
       <Route path="/category/:categoryId" element={<ProductsByCategoryPage />} /> 
       <Route path="/checkout" element={<CheckoutPage />} />
+      <Route path="/promotions" element={<Promotions />} />
       <Route path="/thank-you" element={<ThankYouPage />} />
       <Route path="/account" element={<AccountProfile />} />
+      
 
-      {/* Admin Dashboard Layout */}
+
+     {/* Admin Dashboard Layout */}
       <Route path="/dashboard/*" element={
-        <ProtectedRoute requiredRole="admin">
-          <Dashboard
-            darkMode={darkMode}
-            toggleSidebar={toggleSidebar}
-            toggleDarkMode={toggleDarkMode}
-            sidebarCollapsed={sidebarCollapsed}
-            activeTab={activeTab}
-            setActiveTab={setActiveTab}
-          />
-        </ProtectedRoute>
-      }>
-        {/* Nested Admin Routes */}
-        <Route index element={<DashboardHome />} />
-        <Route path="products" element={<ProductList />} />
-        {/* <Route path="products/add" element={<AddProduct />} />
-        <Route path="products/edit/:id" element={<EditProduct />} /> */}
-        <Route path="orders" element={<OrderList />} />
-        <Route path="category" element={<CategoryList />} />
-        <Route path="users" element={<UserList />} />
-        <Route path="reviews" element={<ReviewList />} />
-        <Route path="discounts" element={<DiscountList />} />
-        <Route path="messages" element={<MessageList />} />
-        <Route path="settings" element={<AdminSettings />} />
-        <Route path="*" element={<NotFound />} />
-      </Route>
+                <ProtectedRoute requiredRole="admin">
+                  <Dashboard toggleSidebar={toggleSidebar} 
+                  darkMode={darkMode} 
+                  toggleDarkMode={toggleDarkMode} 
+                  sidebarCollapsed={sidebarCollapsed}
+                  activeTab={activeTab}
+                  setActiveTab={setActiveTab}
+
+                  />
+                </ProtectedRoute>
+              }>
+      <Route index element={<DashboardHome />} />
+      <Route path="products" element={<ProductList />} />
+      <Route path="orders" element={<OrderList />} />
+      <Route path="category" element={<CategoryList />} />
+      <Route path="users" element={<UserList />} />
+      <Route path="reviews" element={<ReviewList />} />
+      <Route path="discounts" element={<DiscountList />} />
+       <Route path="messages" element={<MessageList />} />
+      <Route path="settings" element={<AdminSettings />} />
+      <Route path="seasonal" element={<SeasonalList />} />
+      <Route path="subscriptions" element={<SubscriptionList/>}/>
+
+      <Route path="*" element={<NotFound/>}/>
+     </Route>
     </Routes>
   );
 }
 
 export default AppRoutes;
-

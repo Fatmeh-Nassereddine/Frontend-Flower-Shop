@@ -7,6 +7,7 @@ import Features from '../components/Features';
 import CategorySection from '../components/CategorySection';
 import Testimonials from '../components/Testimonials';
 import Newsletter from '../components/Newsletter';
+import DiscountBanner from "../components/DiscountBanner";
 
 
 
@@ -15,7 +16,9 @@ function Home() {
 
   return (
     <>
+    
       <Header />
+      <DiscountBanner />
       <Hero />
       <About />
       <Features />

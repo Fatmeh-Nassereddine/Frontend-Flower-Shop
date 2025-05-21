@@ -14,6 +14,8 @@ export function ProductCard({
   price,
   liked,
   productId,
+  minimal = false, // <--- new prop
+  style = {}, // Accept a style prop to control image style
 }) {
   const { addToCart, cartItems } = useShop();
   const [user, setUser] = React.useState(null);
@@ -96,7 +98,12 @@ export function ProductCard({
         src={image}
         alt={title}
         className="w-full h-64 object-cover rounded-lg"
+        style={style} // Apply the passed style to the image
       />
+      {!minimal && (
+        <>
+
+
       <span className="mt-2.5 text-lg font-semibold">{title}</span>
       <span className="mt-2.5 text-xl text-[#D63384]">${price}</span>
 
@@ -119,6 +126,8 @@ export function ProductCard({
           <FiShoppingCart />
         </button>
       </div>
+      </>
+      )}
     </div>
   );
 }
