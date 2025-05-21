@@ -15,8 +15,9 @@ export default function ProductPage() {
   const [quantity, setQuantity] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [likeLoading, setLikeLoading] = useState(false);
 
-  const { cartItems, likedItems, addToCart, toggleLike } = useShop();
+  const { cartItems, likedItems, addToCart, removeFromCart, toggleLike } = useShop();
   const navigate = useNavigate(); // Use useNavigate to handle redirects
 
   const isLiked = likedItems.includes(productId);  // Check if product is liked
@@ -53,19 +54,30 @@ export default function ProductPage() {
   const handleAddToCart = async () => {
     const loggedIn = await isUserLoggedIn();
     if (!loggedIn) {
-      toast.error("Please log in to add items to your cart.");
-      navigate("/login"); // Redirect to login page using navigate
+      toast.error("Please log in to manage your cart.");
+      navigate("/login");
       return;
     }
-
+  
     try {
-      for (let i = 0; i < quantity; i++) {
-        await addToCart(productId); // ✅ Add product to cart
+      const existingCartItem = cartItems.find(
+        (item) => item.product_id === productId || item.id === productId
+      );
+  
+      if (existingCartItem) {
+        // Remove using the cart_item_id
+        await removeFromCart(existingCartItem.id || existingCartItem.cart_item_id);
+        toast.success("Removed from cart.");
+      } else {
+        await addToCart(productId, quantity);
+        toast.success("Added to cart.");
       }
-    } catch {
-      toast.error("Failed to add product to cart.");
+    } catch (error) {
+      toast.error("Failed to update cart.");
+      console.error(error);
     }
   };
+  
 
   const handleLikeToggle = async () => {
     const loggedIn = await isUserLoggedIn();
@@ -75,8 +87,9 @@ export default function ProductPage() {
       return;
     }
 
-    console.log("Toggling like for productId:", productId);
-    toggleLike(productId);  // Toggle like for the product
+    setLikeLoading(true);
+    await toggleLike(productId);
+    setLikeLoading(false);
   };
 
   if (loading) return <div className="text-center p-10">Loading product...</div>;
@@ -126,7 +139,9 @@ export default function ProductPage() {
                 text={
                   <>
                     <ShoppingCart className="h-5 w-5 inline-block mr-2" />
-                    {isInCart ? "Added to Cart" : "Add to Cart"}
+                    {cartItems.some((item) => item.product_id === productId || item.id === productId)
+                    ? "Remove from Cart"
+                    : "Add to Cart"}
                   </>
                 }
               />

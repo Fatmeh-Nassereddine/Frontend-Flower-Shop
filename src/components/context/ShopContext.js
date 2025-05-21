@@ -124,6 +124,20 @@ export function ShopProvider({ children }) {
       toast.error("Please log in to add items.");
       return;
     }
+    // Optimistic update
+  setCartItems((prevItems) => {
+    const itemIndex = prevItems.findIndex(
+      (item) => item.product_id === productId || item.id === productId
+    );
+
+    if (itemIndex >= 0) {
+      const updatedItems = [...prevItems];
+      updatedItems[itemIndex].quantity += quantity;
+      return updatedItems;
+    } else {
+      return [...prevItems, { product_id: productId, quantity }];
+    }
+  });
     try {
       await addProductToCart(userId, productId, quantity);
       const cartData = await getUserCart(userId);
@@ -131,6 +145,9 @@ export function ShopProvider({ children }) {
       toast.success("Added to cart.");
     } catch {
       toast.error("Failed to add to cart.");
+      // revert optimistic update (simple way: refetch cart)
+    const cartData = await getUserCart(userId);
+    setCartItems(cartData?.items || []);
     }
   };
 
@@ -167,26 +184,32 @@ export function ShopProvider({ children }) {
 
   const toggleLike = async (productId) => {
     if (!userId) {
-      toast.error("Please log in to like items.");
+      toast.error("Please log in to add to favorites.");
       return;
     }
-
+  
+    const alreadyLiked = likedItems.includes(productId);
+    const updatedLikes = alreadyLiked
+      ? likedItems.filter((id) => id !== productId)
+      : [...likedItems, productId];
+  
+    setLikedItems(updatedLikes); // ✅ Optimistic update
+  
     try {
-      const alreadyLiked = likedItems.includes(productId);
       if (alreadyLiked) {
         await removeFavorite(productId);
-        setLikedItems((prev) => prev.filter((id) => id !== productId));
         toast.success("Removed from favorites.");
       } else {
         await addFavorite(productId);
-        setLikedItems((prev) => [...prev, productId]);
         toast.success("Added to favorites.");
       }
     } catch (error) {
+      // ❌ Revert the state if API fails
+      setLikedItems(likedItems); 
       toast.error("Failed to update favorites.");
-      console.error("toggleLike error:", error);
     }
   };
+  
 
   // 🧮 Get subtotal
   const getCartSubtotal = () => {

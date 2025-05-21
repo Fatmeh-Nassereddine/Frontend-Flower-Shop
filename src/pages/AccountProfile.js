@@ -956,7 +956,7 @@ const AccountProfile = () => {
 
   const getUser = async () => {
     try {
-      const response = await axios.get('https://backend-flower-shop.onrender.com/api/auth/verify', {
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}api/auth/verify`, {
         withCredentials: true,
       });
       if (!response.data.success) {

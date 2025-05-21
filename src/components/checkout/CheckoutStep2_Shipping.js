@@ -1858,7 +1858,7 @@ function Step2({ nextStep, prevStep, currentShippingCost, updateCheckoutData }) 
   const [cartItems, setCartItems] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  const { getCartSubtotal, getDiscountedTotal } = useShop();
+  const { getCartSubtotal, getDiscountedTotal, clearCart } = useShop();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -1919,6 +1919,9 @@ function Step2({ nextStep, prevStep, currentShippingCost, updateCheckoutData }) 
 
     try {
       const data = await checkoutOrder(payload);
+
+      // ✅ Clear the cart from frontend context
+      clearCart();
 
       if (data?.order_id) {
         toast.success('Order placed successfully');
