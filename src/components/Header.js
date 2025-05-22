@@ -35,7 +35,7 @@ function Header() {
     <header className="bg-[#9EA0A2] shadow-md px-4 md:px-10 py-4">
       <div className="flex items-center justify-between">
         <Link to="/" className="flex items-center space-x-2">
-          <img src={logo} alt="Logo" className="w-32 h-32 cursor-pointer" />
+          <img src={logo} alt="Logo" className="w-24 h-24 cursor-pointer" />
           <span className="text-sm md:text-base font-light uppercase text-white font-hina">
             Tima's Elegant Essence
           </span>
