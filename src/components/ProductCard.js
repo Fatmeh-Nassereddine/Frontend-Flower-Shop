@@ -4,6 +4,7 @@ import { getUser } from "../api/auth";
 import { useShop } from "../components/context/ShopContext";
 import { toast } from "react-toastify";
 import axios from "axios";
+import Cookies from "js-cookie";
 
 // Set the backend URL
 const BASE_URL = "https://backend-flower-shop.onrender.com/api";
@@ -42,7 +43,7 @@ export function ProductCard({
     }
 
     try {
-      const token = localStorage.getItem("token");
+      const token = Cookies.get("token");
       if (!token) return;
 
       if (liked) {

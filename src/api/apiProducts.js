@@ -165,6 +165,7 @@
 
 
 import axios from 'axios';
+import Cookies from 'js-cookie';
 
 // ✅ Set direct backend URL
 const API_URL = 'https://backend-flower-shop.onrender.com/api/products';
@@ -181,7 +182,7 @@ const apiClient = axios.create({
 // Add Authorization token to every request if available
 apiClient.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token'); // Or use cookies/context/etc.
+    const token = Cookies.get('token'); // ✅ get token from cookies
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -248,45 +249,78 @@ export const getProductById = async (productId) => {
   }
 };
 
+
+
+// 🔧 Utility to safely append data to FormData
+const buildFormData = (productData, imageFiles) => {
+  const formData = new FormData();
+
+  // Handle regular fields
+  const fields = [
+    'name', 'description', 'price', 'stock_quantity',
+    'category_id', 'season_id', 'is_seasonal', 'is_featured'
+  ];
+
+  fields.forEach((field) => {
+    if (productData[field] !== undefined && productData[field] !== null) {
+      let value = productData[field];
+      
+      // Convert booleans to 1/0
+      if (field === 'is_seasonal' || field === 'is_featured') {
+        value = value ? 1 : 0;
+      }
+      
+  
+      
+      formData.append(field, value.toString());
+    }
+  });
+
+  // Handle image files
+  if (imageFiles?.length) {
+    imageFiles.forEach((file) => {
+      formData.append('images', file);
+    });
+  }
+
+  return formData;
+};
+
 // 🔹 Add a new product
+
 export const addProduct = async (productData, imageFiles) => {
   try {
-    const formData = new FormData();
-    for (const key in productData) {
-      if (productData[key] !== undefined && productData[key] !== null) {
-        formData.append(key, productData[key]);
-      }
-    }
-    if (imageFiles?.length) {
-      imageFiles.forEach((file) => formData.append('images', file));
+    const formData = buildFormData(productData, imageFiles);
+     // Log FormData contents for debugging
+     for (let [key, value] of formData.entries()) {
+      console.log(key, value);
     }
 
     const response = await apiClient.post('/create', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
     });
 
     return response.data;
   } catch (error) {
     console.error("Error adding product:", error);
-    throw new Error(error.response?.data?.message || 'Failed to add product');
+    const errorMessage = error.response?.data?.message || 
+                       error.response?.data?.error?.join(', ') || 
+                       'Failed to add product';
+    throw new Error(errorMessage);
   }
-};
+};;
 
 // 🔹 Update product
 export const updateProduct = async (id, productData, imageFiles) => {
   try {
-    const formData = new FormData();
-    for (const key in productData) {
-      if (productData[key] !== undefined && productData[key] !== null) {
-        formData.append(key, productData[key]);
-      }
-    }
-    if (imageFiles?.length) {
-      imageFiles.forEach((file) => formData.append('images', file));
-    }
+    const formData = buildFormData(productData, imageFiles);
 
     const response = await apiClient.put(`/${id}`, formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
     });
 
     return response.data;
@@ -295,6 +329,7 @@ export const updateProduct = async (id, productData, imageFiles) => {
     throw new Error(error.response?.data?.message || 'Failed to update product');
   }
 };
+
 
 // 🔹 Delete product
 export const deleteProduct = async (id) => {

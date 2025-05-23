@@ -110,7 +110,7 @@ export const AuthProvider = ({ children }) => {
     navigate("/login");
   };
 
-  const value = { user, loginUser, registerUser, logoutUser };
+  const value = { user, setUser, loginUser, registerUser, logoutUser };
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 

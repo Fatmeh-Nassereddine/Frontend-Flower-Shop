@@ -53,8 +53,24 @@ function Header() {
 
         {/* Desktop Icons */}
         <div className="hidden md:flex items-center space-x-4 text-white text-lg relative">
-          <FiPhone className="cursor-pointer hover:text-[#B03074]" />
-          <FiMapPin className="cursor-pointer hover:text-[#B03074]" />
+        <a
+            href="https://chat.whatsapp.com/EJu9WVdIIBmJF1fPGYmMju"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="WhatsApp Group"
+            className="hover:text-[#B03074]"
+          >
+            <FiPhone className="cursor-pointer" />
+          </a>
+          <a
+            href="https://www.google.com/maps/place/1600+Amphitheatre+Parkway,+Mountain+View,+CA"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Location Map"
+            className="hover:text-[#B03074]"
+          >
+            <FiMapPin className="cursor-pointer" />
+          </a>
           <Link to="/favorite" className="relative">
             <FiHeart className="cursor-pointer hover:text-[#B03074]" />
             {likedItems.length > 0 && (
@@ -128,8 +144,24 @@ function Header() {
 
           <div className="flex flex-col gap-3 text-lg mt-4">
             <div className="flex items-center space-x-4">
-              <FiPhone className="hover:text-[#593825]" />
-              <FiMapPin className="hover:text-[#593825]" />
+            <a
+                href="https://chat.whatsapp.com/EJu9WVdIIBmJF1fPGYmMju"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="WhatsApp Group"
+                className="hover:text-[#B03074]"
+              >
+                <FiPhone className="cursor-pointer" />
+              </a>
+              <a
+                href="https://www.google.com/maps/place/1600+Amphitheatre+Parkway,+Mountain+View,+CA"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Location Map"
+                className="hover:text-[#B03074]"
+              >
+                <FiMapPin className="cursor-pointer" />
+              </a>
               <FiHeart className="hover:text-[#593825]" />
               <FiShoppingCart className="hover:text-[#593825]" />
             </div>
