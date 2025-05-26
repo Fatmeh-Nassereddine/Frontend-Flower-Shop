@@ -2042,7 +2042,7 @@ function Step2({ nextStep, prevStep, currentShippingCost, updateCheckoutData }) 
                   <span className="text-sm text-gray-600">Qty: {item.quantity}</span>
                 </div>
                 <span className="ml-auto font-semibold">
-                ${Number(item.unit_price || 0) * Number(item.quantity || 0).toFixed(2)}
+                ${ (Number(item.unit_price || 0) * Number(item.quantity || 0)).toFixed(2) }
                 </span>
               </div>
             ))}
