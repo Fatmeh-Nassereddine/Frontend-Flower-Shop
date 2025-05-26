@@ -2041,7 +2041,9 @@ function Step2({ nextStep, prevStep, currentShippingCost, updateCheckoutData }) 
                   <h4 className="font-semibold">{item.name}</h4>
                   <span className="text-sm text-gray-600">Qty: {item.quantity}</span>
                 </div>
-                <span className="ml-auto font-semibold">${(item.unit_price * item.quantity).toFixed(2)}</span>
+                <span className="ml-auto font-semibold">
+                ${Number(item.unit_price || 0) * Number(item.quantity || 0).toFixed(2)}
+                </span>
               </div>
             ))}
 
