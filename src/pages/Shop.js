@@ -125,13 +125,13 @@ function Shop() {
           <PriceRange min={0} max={200} onChange={debouncedPrice} />
 
           <div className="my-4">
-            <button
-              onClick={clearFilters}
-              className="text-sm text-red-500 underline hover:text-red-700"
-            >
-              Clear All Filters
-            </button>
-          </div>
+          <button
+            onClick={clearFilters}
+            className="px-4 py-2 text-sm font-medium text-pink-600 bg-pink-50 rounded-xl hover:bg-pink-100 hover:text-pink-700 focus:outline-none focus:ring-2 focus:ring-pink-300 transition-all"
+          >
+            Clear All Filters
+          </button>
+        </div>
 
           <h2 className="text-xl font-bold mb-4">Filters</h2>
 

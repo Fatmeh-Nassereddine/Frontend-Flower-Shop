@@ -346,12 +346,12 @@ export const updateProduct = async (id, productData, imageFiles) => {
 
 
 // 🔹 Delete product
-export const deleteProduct = async (id) => {
+export const deleteProduct = async (product_id) => {
   try {
-    const response = await apiClient.delete(`/${id}`);
+    const response = await apiClient.delete(`/${product_id}`);
     return response.data;
   } catch (error) {
-    console.error(`Error deleting product with ID ${id}:`, error);
+    console.error(`Error deleting product with ID ${product_id}:`, error);
     throw new Error('Failed to delete product');
   }
 };

@@ -8,6 +8,7 @@ import cat2 from '../assets/cat2.png';
 import cat3 from '../assets/cat3.png';
 import cat4 from '../assets/cat4.png';
 import cat5 from '../assets/cat5.png';
+import cat6 from '../assets/cat6.jpeg';
 import CategoryCarousel from './CategoryCarousel'; // adjust the path if needed
 
 const categories = [
@@ -16,6 +17,7 @@ const categories = [
   { title: 'Arrangements', image: cat3 },
   { title: 'Gifts', image: cat4 },
   { title: 'Ikebana', image: cat5 },
+  { title: 'Weddings', image: cat6 },
 ];
 
 function CategorySection() {

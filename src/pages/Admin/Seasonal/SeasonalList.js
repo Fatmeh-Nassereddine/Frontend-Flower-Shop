@@ -245,17 +245,27 @@ const SeasonalList = () => {
     try {
       const data = await apiSeasons.getAll();
       setSeasons(
-        data.map(season => ({
-          season_id: season.id || season.season_id || "",
-          name: season.name || "",
-          start_date: season.start_date ? season.start_date.split("T")[0] : "",
-          end_date: season.end_date ? season.end_date.split("T")[0] : "",
-        }))
+        data
+          .map(season => {
+            const id = season.season_id || season.id || null;
+            if (!id) {
+              console.warn("Skipping season with missing ID:", season);
+              return null;
+            }
+            return {
+              season_id: id,
+              name: season.name || "",
+              start_date: season.start_date ? season.start_date.split("T")[0] : "",
+              end_date: season.end_date ? season.end_date.split("T")[0] : "",
+            };
+          })
+          .filter(Boolean) // Remove any nulls from the array
       );
     } catch (error) {
       toast.error("Failed to load seasons");
     }
   };
+  
 
   const openModal = (season = null) => {
     setEditingSeason(season);

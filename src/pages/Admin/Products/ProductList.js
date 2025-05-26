@@ -865,6 +865,7 @@ import { toast } from "react-toastify";
 import { MdOutlineAddBusiness, MdRebaseEdit, MdDeleteSweep } from "react-icons/md";
 import { v4 as uuidv4 } from 'uuid';
 
+
 Modal.setAppElement('#root');
 
 const ProductList = () => {
@@ -959,26 +960,18 @@ const ProductList = () => {
       toast.error(validationError);
       return;
     }
-
+  
     if (!window.confirm("Are you sure you want to update this product?")) return;
-
+  
     try {
-      const formData = new FormData();
-      Object.entries(updatedProduct).forEach(([key, value]) => {
-        if (key === "price" || key === "stock_quantity") {
-          formData.append(key, parseFloat(value));
-        } else if (key === "is_seasonal" || key === "is_featured") {
-          formData.append(key, value ? "1" : "0");
-        } else {
-          formData.append(key, value);
-        }
-      });
-      
-      imageFiles.forEach(file => {
-        formData.append('images', file);
-      });
-
-      await updateProduct(currentProduct.product_id, formData);
+       // ✅ Add product_id to the payload
+    const fullProductData = {
+      ...updatedProduct,
+      product_id: currentProduct.product_id
+    };
+     
+  
+      await updateProduct(currentProduct.product_id, fullProductData, imageFiles);
       toast.success("Product updated successfully!");
       setIsEditModalOpen(false);
       const response = await getAllProducts(currentPage, limit);
@@ -989,6 +982,7 @@ const ProductList = () => {
       toast.error(error.message || "Failed to update product.");
     }
   };
+  
 
   const handleAddProduct = async () => {
     const validationError = validateProduct(newProduct);
@@ -1035,14 +1029,15 @@ const ProductList = () => {
     }
   };
 
-  const handleDeleteProduct = async (id) => {
+  const handleDeleteProduct = async (product_id) => {
     if (!window.confirm("Are you sure you want to delete this product?")) return;
     try {
-      await deleteProduct(id);
+      await deleteProduct(product_id);
       toast.success("Product deleted successfully!");
       const response = await getAllProducts(currentPage, limit);
       setProducts(response.data);
     } catch (error) {
+      console.error("Delete error:", error);
       toast.error("Failed to delete product.");
     }
   };
