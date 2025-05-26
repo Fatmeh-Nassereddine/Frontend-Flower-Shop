@@ -255,28 +255,41 @@ export const getProductById = async (productId) => {
 const buildFormData = (productData, imageFiles) => {
   const formData = new FormData();
 
-  // Handle regular fields
   const fields = [
-    'name', 'description', 'price', 'stock_quantity',
-    'category_id', 'season_id', 'is_seasonal', 'is_featured'
+    'product_id',    
+    'name',
+    'description',
+    'price',
+    'stock_quantity',
+    'category_id',
+    'season_id',
+    'is_seasonal',
+    'is_featured',
   ];
 
   fields.forEach((field) => {
-    if (productData[field] !== undefined && productData[field] !== null) {
-      let value = productData[field];
-      
-      // Convert booleans to 1/0
+    let value = productData[field];
+
+    if (value !== undefined && value !== null) {
+      // Convert booleans to 0/1
       if (field === 'is_seasonal' || field === 'is_featured') {
         value = value ? 1 : 0;
       }
-      
-  
-      
-      formData.append(field, value.toString());
+
+      // Convert numeric fields to string (FormData only accepts string/blob)
+      if (
+        field === 'price' ||
+        field === 'stock_quantity' ||
+        field === 'is_seasonal' ||
+        field === 'is_featured'
+      ) {
+        value = value.toString();
+      }
+
+      formData.append(field, value);
     }
   });
 
-  // Handle image files
   if (imageFiles?.length) {
     imageFiles.forEach((file) => {
       formData.append('images', file);
@@ -285,6 +298,7 @@ const buildFormData = (productData, imageFiles) => {
 
   return formData;
 };
+
 
 // 🔹 Add a new product
 
@@ -310,7 +324,7 @@ export const addProduct = async (productData, imageFiles) => {
                        'Failed to add product';
     throw new Error(errorMessage);
   }
-};;
+};
 
 // 🔹 Update product
 export const updateProduct = async (id, productData, imageFiles) => {

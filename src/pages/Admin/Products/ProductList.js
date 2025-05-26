@@ -863,6 +863,7 @@ import { ProductCard } from "../../../components/ProductCard";
 import Modal from "react-modal";
 import { toast } from "react-toastify";
 import { MdOutlineAddBusiness, MdRebaseEdit, MdDeleteSweep } from "react-icons/md";
+import { v4 as uuidv4 } from 'uuid';
 
 Modal.setAppElement('#root');
 
@@ -943,7 +944,7 @@ const ProductList = () => {
     if (!product.stock_quantity || isNaN(product.stock_quantity) || Number(product.stock_quantity) < 0) {
       return "Stock quantity must be a non-negative number";
     }
-    if (!product.category_id || !/^[0-9a-fA-F\-]{36}$/.test(product.category_id)) {
+    if (!product.category_id || !/^[0-9a-fA-F-]{36}$/.test(product.category_id)) {
       return "Category ID must be a valid UUID";
     }
     if (!product.season_id || !/^[A-Za-z0-9]{1,10}$/.test(product.season_id)) {
@@ -964,12 +965,15 @@ const ProductList = () => {
     try {
       const formData = new FormData();
       Object.entries(updatedProduct).forEach(([key, value]) => {
-        if (typeof value === "boolean") {
+        if (key === "price" || key === "stock_quantity") {
+          formData.append(key, parseFloat(value));
+        } else if (key === "is_seasonal" || key === "is_featured") {
           formData.append(key, value ? "1" : "0");
         } else {
           formData.append(key, value);
         }
       });
+      
       imageFiles.forEach(file => {
         formData.append('images', file);
       });
@@ -998,17 +1002,27 @@ const ProductList = () => {
     try {
       const formData = new FormData();
       Object.entries(newProduct).forEach(([key, value]) => {
-        if (typeof value === "boolean") {
+        if (key === "price" || key === "stock_quantity") {
+          formData.append(key, parseFloat(value));
+        } else if (typeof value === "boolean")  {
           formData.append(key, value ? "1" : "0");
         } else {
           formData.append(key, value);
         }
       });
+      // ✅ Generate a UUID for the new product
+    const productWithId = { ...newProduct, product_id: uuidv4() };
+      
       imageFiles.forEach(file => {
         formData.append('images', file);
       });
 
-      await addProduct(newProduct, imageFiles);
+        // 👉 Add this to inspect what's being sent:
+    for (let pair of formData.entries()) {
+      console.log(`${pair[0]}: ${pair[1]}`);
+    }
+
+      await addProduct(productWithId, imageFiles);
       toast.success("Product added successfully!");
       setIsAddModalOpen(false);
       const response = await getAllProducts(currentPage, limit);
