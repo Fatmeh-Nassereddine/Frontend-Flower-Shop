@@ -2030,22 +2030,28 @@ function Step2({ nextStep, prevStep, currentShippingCost, updateCheckoutData }) 
           <p>No items in cart</p>
         ) : (
           <>
-            {cartItems.map((item) => (
-              <div key={item.product_id} className="flex items-center gap-4 mb-4">
+            {cartItems.map((item) => {
+              console.log("🛒 cart item:", item); // ← ADD THIS
+              const price = parseFloat(item.product_price || "0");
+              const quantity = parseInt(item.quantity || "0", 10);
+          return (
+
+              <div key={item.cart_item_id} className="flex items-center gap-4 mb-4">
                 <img
                   src={item.product_image || '/placeholder.jpg'}
-                  alt={item.name}
+                  alt={item.product_name}
                   className="w-16 h-16 rounded-md object-cover"
                 />
                 <div>
-                  <h4 className="font-semibold">{item.name}</h4>
-                  <span className="text-sm text-gray-600">Qty: {item.quantity}</span>
+                  <h4 className="font-semibold">{item.product_name}</h4>
+                  <span className="text-sm text-gray-600">Qty: {quantity}</span>
                 </div>
                 <span className="ml-auto font-semibold">
-                ${((Number(item.product?.price) || 0) * Number(item.quantity || 0)).toFixed(2)}
+                ${(price * quantity).toFixed(2)}
                 </span>
               </div>
-            ))}
+            );
+            })}
 
             <hr className="my-4" />
             <div className="flex justify-between text-lg font-semibold">
